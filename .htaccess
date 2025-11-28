@@ -1,0 +1,14 @@
+RewriteEngine On
+
+# Laisser passer les ressources existantes
+RewriteCond %{REQUEST_FILENAME} -f [OR]
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule ^ - [L]
+
+# Exclusions pour les APIs, l'admin et les assets
+RewriteRule ^api/ - [L]
+RewriteRule ^admin/ - [L]
+RewriteRule ^assets/ - [L]
+
+# Fallback SPA
+RewriteRule . index.html [L]

@@ -4,12 +4,12 @@ import { createRoot } from "https://esm.sh/react-dom@18.2.0/client";
 const h = React.createElement;
 
 const CATEGORIES = [
-  { slug: "aerodynamique", label: "Aérodynamique" },
-  { slug: "histoire", label: "Histoire" },
-  { slug: "navigation", label: "Navigation" },
-  { slug: "meteo", label: "Météorologie" },
-  { slug: "reglementation", label: "Réglementation" },
-  { slug: "securite", label: "Sécurité" },
+  { slug: "aerodynamique", label: "Aérodynamique et mécanique du vol" },
+  { slug: "aeronefs", label: "Connaissance des aéronefs" },
+  { slug: "meteo", label: "Météorologie et aérologie" },
+  { slug: "navigation", label: "Navigation, sécurité et réglementation" },
+  { slug: "histoire", label: "Histoire de l’aéronautique et de l’espace" },
+  { slug: "anglais", label: "Anglais aéronautique" },
 ];
 
 function useTheme() {
@@ -83,6 +83,11 @@ function AdminApp() {
   const [status, setStatus] = useState("");
   const [preview, setPreview] = useState([]);
 
+  const logout = async () => {
+    await fetch("../api/auth.php", { method: "DELETE" });
+    window.location = "/admin/login.php";
+  };
+
   useEffect(() => {
     fetchQuizzes(setState);
   }, []);
@@ -106,6 +111,11 @@ function AdminApp() {
           "button",
           { className: "btn btn-ghost", onClick: () => setTheme(theme === "light" ? "dark" : "light") },
           theme === "light" ? "🌙 Mode sombre" : "☀️ Mode clair"
+        ),
+        h(
+          "button",
+          { className: "btn btn-ghost", onClick: logout },
+          "Se déconnecter"
         )
       )
     ),

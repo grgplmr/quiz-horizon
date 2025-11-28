@@ -4,12 +4,20 @@ import { createRoot } from "https://esm.sh/react-dom@18.2.0/client";
 const h = React.createElement;
 
 const CATEGORIES = [
-  { slug: "aerodynamique", label: "Aérodynamique", icon: "✈️" },
-  { slug: "histoire", label: "Histoire de l'aviation", icon: "📜" },
-  { slug: "navigation", label: "Navigation", icon: "🧭" },
-  { slug: "meteo", label: "Météorologie", icon: "🌤️" },
-  { slug: "reglementation", label: "Réglementation", icon: "📑" },
-  { slug: "securite", label: "Sécurité et facteurs", icon: "🛟" },
+  {
+    slug: "aerodynamique",
+    label: "Aérodynamique et mécanique du vol",
+    icon: "✈️",
+  },
+  { slug: "aeronefs", label: "Connaissance des aéronefs", icon: "🛩️" },
+  { slug: "meteo", label: "Météorologie et aérologie", icon: "🌤️" },
+  {
+    slug: "navigation",
+    label: "Navigation, sécurité et réglementation",
+    icon: "🧭",
+  },
+  { slug: "histoire", label: "Histoire de l’aéronautique et de l’espace", icon: "📜" },
+  { slug: "anglais", label: "Anglais aéronautique", icon: "🗣️" },
 ];
 
 const API_INDEX = "/api/quizzes/index.json";
@@ -76,9 +84,14 @@ function Header({ onHome, theme, onToggleTheme }) {
 function Home() {
   return h(
     "div",
-    null,
-    h("div", { className: "pill" }, "Catégories BIA"),
+    { className: "home" },
+    h("div", { className: "pill" }, "Catégories officielles du BIA"),
     h("h1", { className: "section-title" }, "Entraîne-toi par thématique"),
+    h(
+      "p",
+      { className: "muted", style: { maxWidth: 720, margin: "8px auto 0" } },
+      "Accède aux six modules du BIA dans une grille claire et responsive. Sélectionne une thématique pour travailler les notions clés en mode quiz."
+    ),
     h(
       "div",
       { className: "card-grid" },
@@ -90,12 +103,13 @@ function Home() {
             className: "card",
             onClick: () => (window.location.hash = `#/category/${cat.slug}`),
           },
-          h("div", { className: "muted" }, cat.icon + " " + cat.label),
           h(
             "div",
-            { className: "muted" },
-            "Quiz ciblés pour maîtriser les notions essentielles."
-          )
+            { className: "card-title" },
+            h("span", { className: "icon-pill" }, cat.icon),
+            h("div", { className: "card-label" }, cat.label)
+          ),
+          h("div", { className: "muted" }, "Quiz ciblés pour maîtriser les notions essentielles.")
         )
       )
     )
@@ -408,6 +422,7 @@ function AppShell() {
   return h(
     "div",
     { className: "app-shell" },
+    h("div", { className: "back-link" }, h("a", { href: "https://horizonbia.com" }, "← Retour à HorizonBIA.com")),
     h(Header, { onHome: () => (window.location.hash = "#/"), theme, onToggleTheme: setTheme }),
     route.name === "home"
       ? h(Home)
