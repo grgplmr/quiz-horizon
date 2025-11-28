@@ -1,0 +1,107 @@
+:root {
+  color-scheme: dark;
+  --bg: #0d1117;
+  --panel: #161b22;
+  --text: #e6edf3;
+  --accent: #3ea6ff;
+  --muted: #8b949e;
+  --shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: "Inter", system-ui, -apple-system, sans-serif;
+  background: radial-gradient(circle at 20% 20%, rgba(62, 166, 255, 0.08), transparent 25%),
+    radial-gradient(circle at 80% 0%, rgba(62, 166, 255, 0.08), transparent 20%),
+    var(--bg);
+  color: var(--text);
+}
+
+.site-header {
+  padding: 24px;
+  text-align: center;
+  background: rgba(22, 27, 34, 0.8);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(6px);
+}
+
+.site-header h1 {
+  margin: 0;
+  font-size: clamp(1.75rem, 4vw, 2.5rem);
+  letter-spacing: 0.02em;
+}
+
+.content {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 32px 24px 48px;
+}
+
+.modules {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 20px;
+}
+
+.module-card {
+  background: var(--panel);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 14px;
+  padding: 20px;
+  box-shadow: var(--shadow);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  transition: transform 150ms ease, border-color 150ms ease, box-shadow 150ms ease;
+}
+
+.module-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(62, 166, 255, 0.6);
+  box-shadow: 0 14px 30px rgba(62, 166, 255, 0.2);
+}
+
+.module-card h2 {
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.module-card p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.module-card button {
+  margin-top: auto;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: linear-gradient(135deg, rgba(62, 166, 255, 0.18), rgba(62, 166, 255, 0.08));
+  color: var(--text);
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  cursor: pointer;
+  transition: background 150ms ease, border-color 150ms ease, transform 150ms ease;
+}
+
+.module-card button:hover {
+  background: linear-gradient(135deg, rgba(62, 166, 255, 0.28), rgba(62, 166, 255, 0.12));
+  border-color: rgba(62, 166, 255, 0.5);
+  transform: translateY(-1px);
+}
+
+@media (max-width: 720px) {
+  .content {
+    padding: 24px 16px 40px;
+  }
+
+  .modules {
+    gap: 16px;
+  }
+}
