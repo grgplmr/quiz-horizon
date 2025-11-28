@@ -91,7 +91,7 @@ const Home = () => (
             <span className="icon-pill">{cat.icon}</span>
             <div className="card-label">{cat.label}</div>
           </div>
-          <div className="muted">Quiz ciblés pour maîtriser les notions essentielles.</div>
+          <div className="muted">Quiz ciblés pour maîtriser les notions essentielles de ce module.</div>
         </div>
       ))}
     </div>
