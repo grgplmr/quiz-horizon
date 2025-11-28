@@ -1,0 +1,72 @@
+.admin-grid {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  margin-top: 20px;
+}
+
+.panel {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 18px;
+}
+
+body.theme-dark .panel {
+  background: var(--card-dark);
+  border-color: var(--border-dark);
+}
+
+input[type="file"],
+input[type="text"],
+select,
+textarea {
+  width: 100%;
+  padding: 10px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: white;
+}
+
+body.theme-dark input,
+body.theme-dark select,
+body.theme-dark textarea {
+  background: var(--card-dark);
+  border-color: var(--border-dark);
+  color: var(--text-dark);
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table th,
+.table td {
+  text-align: left;
+  padding: 10px;
+  border-bottom: 1px solid var(--border);
+}
+
+.tag {
+  padding: 4px 10px;
+  background: rgba(58, 167, 255, 0.1);
+  color: var(--horizon-blue-dark);
+  border-radius: 999px;
+  font-weight: 700;
+}
+
+.actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 12px;
+}
+
+.preview-card {
+  background: rgba(58, 167, 255, 0.04);
+  padding: 12px;
+  border-radius: 12px;
+  margin-top: 10px;
+  border: 1px solid var(--border);
+}
