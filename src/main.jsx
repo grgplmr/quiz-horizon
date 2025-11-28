@@ -55,7 +55,7 @@ const Header = ({ onHome }) => (
       </div>
       <div className="header-links">
         <a className="header-link" href="https://www.horizonbia.com">
-          ← Retour sur horizonbia.com
+          ← Retour à HorizonBIA.com
         </a>
         <a className="header-link" href="/admin/login.php">
           Espace admin
@@ -96,22 +96,24 @@ const Home = () => (
         </div>
       </div>
     </div>
-    <div className="pill">Catégories officielles du BIA</div>
-    <h1 className="section-title">Entraîne-toi par thématique</h1>
-    <p className="muted" style={{ maxWidth: 720, margin: '8px auto 0' }}>
-      Accède aux six modules du BIA dans une grille claire et responsive. Sélectionne une thématique pour
-      travailler les notions clés en mode quiz.
-    </p>
-    <div className="card-grid">
-      {CATEGORIES.map((cat) => (
-        <div key={cat.slug} className="card" onClick={() => (window.location.hash = `#/category/${cat.slug}`)}>
-          <div className="card-title">
-            <span className="icon-pill">{cat.icon}</span>
-            <div className="card-label">{cat.label}</div>
+    <div className="home-section">
+      <div className="pill">Catégories officielles du BIA</div>
+      <h1 className="section-title">Entraîne-toi par thématique</h1>
+      <p className="section-description">
+        Accède aux six modules du BIA dans une grille claire et responsive. Sélectionne une thématique pour travailler
+        les notions clés en mode quiz.
+      </p>
+      <div className="card-grid">
+        {CATEGORIES.map((cat) => (
+          <div key={cat.slug} className="card" onClick={() => (window.location.hash = `#/category/${cat.slug}`)}>
+            <div className="card-title">
+              <span className="icon-pill">{cat.icon}</span>
+              <div className="card-label">{cat.label}</div>
+            </div>
+            <div className="muted">Quiz ciblés pour maîtriser les notions essentielles.</div>
           </div>
-          <div className="muted">Quiz ciblés pour maîtriser les notions essentielles de ce module.</div>
-        </div>
-      ))}
+        ))}
+      </div>
     </div>
     <section className="how-it-works">
       <h2 className="section-title">Comment ça marche ?</h2>
@@ -135,10 +137,7 @@ const Home = () => (
           <div className="step-text">Visualise ton score et les notions à revoir</div>
         </div>
       </div>
-      <p className="how-note">
-        Mode entraînement : corrections immédiates et répétition des erreurs. Mode examen blanc : résultat global en fin
-        de quiz (bientôt).
-      </p>
+      <p className="how-note">Mode entraînement : corrections immédiates et répétition des erreurs.</p>
     </section>
   </div>
 );

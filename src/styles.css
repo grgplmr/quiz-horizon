@@ -55,12 +55,13 @@ body.theme-dark {
 .hero {
   width: 100%;
   max-width: 840px;
-  margin: 12px auto 48px;
-  padding: 44px 36px;
+  margin: 24px auto 56px;
+  padding: 56px 42px 52px;
   border: 1px solid var(--border);
   border-radius: 22px;
   background: linear-gradient(145deg, rgba(58, 167, 255, 0.08), rgba(255, 255, 255, 0.9));
   box-shadow: 0 20px 48px rgba(58, 167, 255, 0.12);
+  text-align: center;
 }
 
 body.theme-dark .hero {
@@ -72,8 +73,9 @@ body.theme-dark .hero {
 .hero-heading {
   display: flex;
   gap: 18px;
-  align-items: flex-start;
+  align-items: center;
   justify-content: center;
+  flex-direction: column;
   flex-wrap: wrap;
 }
 
@@ -96,13 +98,13 @@ body.theme-dark .hero-badge {
 }
 
 .hero-text {
-  text-align: left;
-  max-width: 620px;
+  text-align: center;
+  max-width: 680px;
 }
 
 .hero-title {
   margin: 0 0 10px;
-  font-size: 40px;
+  font-size: 42px;
   line-height: 1.15;
   letter-spacing: -0.02em;
 }
@@ -318,6 +320,24 @@ body.theme-dark .card {
 
 .card-label {
   flex: 1;
+}
+
+.home-section {
+  width: 100%;
+  text-align: center;
+  margin-top: 4px;
+}
+
+.section-description {
+  max-width: 720px;
+  margin: 8px auto 0;
+  color: var(--muted);
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+body.theme-dark .section-description {
+  color: #cbd5e1;
 }
 
 .how-it-works {
