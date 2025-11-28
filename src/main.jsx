@@ -43,24 +43,26 @@ function useTheme() {
   return [theme, setTheme];
 }
 
-const Header = ({ onHome, theme, onToggleTheme }) => (
-  <div className="header">
-    <div className="logo" onClick={onHome} style={{ cursor: 'pointer' }}>
-      <span className="dot" />
-      <div>
-        <div>HorizonBIA Quiz</div>
-        <div className="muted">Prépa BIA interactive</div>
+const Header = ({ onHome }) => (
+  <header className="header">
+    <div className="header-content">
+      <div className="logo" onClick={onHome} style={{ cursor: 'pointer' }}>
+        <span className="dot" />
+        <div>
+          <div className="logo-title">HorizonBIA Quiz</div>
+          <div className="muted">Prépa BIA interactive</div>
+        </div>
+      </div>
+      <div className="header-links">
+        <a className="header-link" href="https://www.horizonbia.com">
+          ← Retour sur horizonbia.com
+        </a>
+        <a className="header-link" href="/admin/login.php">
+          Espace admin
+        </a>
       </div>
     </div>
-    <div className="top-actions">
-      <button className="btn btn-ghost" onClick={() => onToggleTheme(theme === 'light' ? 'dark' : 'light')}>
-        {theme === 'light' ? '🌙 Mode sombre' : '☀️ Mode clair'}
-      </button>
-      <button className="btn btn-primary" onClick={() => (window.location = '/admin/')}>
-        Espace admin
-      </button>
-    </div>
-  </div>
+  </header>
 );
 
 const Home = () => (
@@ -333,14 +335,11 @@ function ResultView({ quiz, stats, onRestart }) {
 
 function AppShell() {
   const route = useHashRoute();
-  const [theme, setTheme] = useTheme();
+  useTheme();
 
   return (
     <div className="app-shell">
-      <div className="back-link">
-        <a href="https://horizonbia.com">← Retour à HorizonBIA.com</a>
-      </div>
-      <Header onHome={() => (window.location.hash = '#/')} theme={theme} onToggleTheme={setTheme} />
+      <Header onHome={() => (window.location.hash = '#/')} />
       {route.name === 'home' ? (
         <Home />
       ) : route.name === 'category' ? (
