@@ -65,6 +65,24 @@ const Header = ({ onHome }) => (
   </header>
 );
 
+const Footer = () => (
+  <footer className="footer">
+    <div className="footer-content">
+      <div className="footer-links">
+        <a href="https://www.horizonbia.com/mentions-legales/">Mentions légales</a>
+        <span aria-hidden>•</span>
+        <a href="https://www.horizonbia.com/politique-de-confidentialite/">Politique de confidentialité</a>
+        <span aria-hidden>•</span>
+        <a href="https://www.horizonbia.com/contact/">Contact</a>
+      </div>
+      <div className="footer-note">
+        Outil pédagogique gratuit développé par HorizonBIA en partenariat avec l'Aéroclub Marcillac Estuaire pour préparer le
+        BIA.
+      </div>
+    </div>
+  </footer>
+);
+
 const Home = () => (
   <div className="home">
     <div className="hero">
@@ -376,17 +394,20 @@ function AppShell() {
   useTheme();
 
   return (
-    <div className="app-shell">
+    <div className="page">
       <Header onHome={() => (window.location.hash = '#/')} />
-      {route.name === 'home' ? (
-        <Home />
-      ) : route.name === 'category' ? (
-        <Category slug={route.slug} />
-      ) : route.name === 'quiz' ? (
-        <Quiz slug={route.slug} />
-      ) : (
-        <p>Bienvenue sur HorizonBIA</p>
-      )}
+      <main className="app-shell">
+        {route.name === 'home' ? (
+          <Home />
+        ) : route.name === 'category' ? (
+          <Category slug={route.slug} />
+        ) : route.name === 'quiz' ? (
+          <Quiz slug={route.slug} />
+        ) : (
+          <p>Bienvenue sur HorizonBIA</p>
+        )}
+      </main>
+      <Footer />
     </div>
   );
 }
