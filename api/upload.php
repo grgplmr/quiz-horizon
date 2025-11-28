@@ -1,4 +1,5 @@
 <?php
+session_start();
 header('Content-Type: application/json; charset=utf-8');
 $quizzesDir = __DIR__ . '/quizzes';
 if (!is_dir($quizzesDir)) {
@@ -21,6 +22,10 @@ function nextFilename($category, $dir) {
         }
     }
     return sprintf('%s-%d.json', $category, $max + 1);
+}
+
+if (!isset($_SESSION['is_admin']) || $_SESSION['is_admin'] !== true) {
+    respond(['success' => false, 'error' => 'Non autorisé'], 401);
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
