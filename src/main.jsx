@@ -334,21 +334,25 @@ function Quiz({ slug }) {
         </div>
       </div>
       <div className="question-shell">
-        <h2>{question.text}</h2>
+        <div className="question-title">
+          <h2>{question.text}</h2>
+        </div>
         <div className="choices">
           {question.choices.map((choice, idx) => (
             <label
               key={idx}
               className={`choice ${feedback ? (idx === question.answer ? 'correct' : idx === Number(selected) ? 'wrong' : '') : selected === idx ? 'selected' : ''}`}
             >
-              <input
-                type="radio"
-                name="choice"
-                checked={selected === idx}
-                onChange={() => !feedback && setSelected(idx)}
-                disabled={!!feedback}
-              />
-              <span>{choice}</span>
+              <div className="choice-inner">
+                <input
+                  type="radio"
+                  name="choice"
+                  checked={selected === idx}
+                  onChange={() => !feedback && setSelected(idx)}
+                  disabled={!!feedback}
+                />
+                <span className="choice-text">{choice}</span>
+              </div>
             </label>
           ))}
         </div>
