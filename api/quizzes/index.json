@@ -1,1 +1,9 @@
-[]
+[
+  {
+    "id": "histoire-1",
+    "module": "histoire",
+    "title": "Histoire 1 - Montgolfières",
+    "description": "Quiz d’introduction sur les premiers ballons et les montgolfières.",
+    "questionsFile": "histoire-1.json"
+  }
+]

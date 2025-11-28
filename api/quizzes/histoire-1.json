@@ -1,0 +1,227 @@
+{
+  "id": "histoire-1",
+  "module": "histoire",
+  "title": "Histoire 1 - Montgolfières",
+  "questions": [
+    {
+      "text": "Quand et où a eu lieu le premier vol d’un ballon Montgolfier ?",
+      "choices": [
+        "19 septembre 1783 à Versailles",
+        "5 juin 1783 à Annonay",
+        "21 novembre 1783 à Paris",
+        "27 août 1783 à Lyon"
+      ],
+      "correctIndex": 1,
+      "explanation": "Le premier vol public d’un ballon Montgolfier a eu lieu à Annonay, le 5 juin 1783."
+    },
+    {
+      "text": "Quel matériau principalement composait l’enveloppe des premiers ballons Montgolfier ?",
+      "choices": [
+        "Du caoutchouc",
+        "Du tissu enduit de résine",
+        "Du papier et de la toile",
+        "Du cuir fin"
+      ],
+      "correctIndex": 2,
+      "explanation": "Les frères Montgolfier utilisaient une combinaison de papier et de toile pour construire l’enveloppe."
+    },
+    {
+      "text": "Quel gaz remplissait les premières Montgolfières ?",
+      "choices": [
+        "De l’hydrogène",
+        "De l’hélium",
+        "De l’air chaud",
+        "Du gaz de houille"
+      ],
+      "correctIndex": 2,
+      "explanation": "Les Montgolfières se basent sur l’air chaud, produit par un feu placé sous l’ouverture du ballon."
+    },
+    {
+      "text": "Quel était l’objectif initial des frères Montgolfier en expérimentant les ballons ?",
+      "choices": [
+        "Transporter du courrier",
+        "Observer la météo",
+        "Trouver un moyen de remplacer les montures pendant la guerre",
+        "Comprendre la portance des fumées"
+      ],
+      "correctIndex": 3,
+      "explanation": "Les frères cherchaient d’abord à comprendre comment les fumées pouvaient faire monter des objets."
+    },
+    {
+      "text": "Qui furent les premiers passagers vivants d’une Montgolfière devant Louis XVI ?",
+      "choices": [
+        "Un chien et un chat",
+        "Un mouton, un coq et un canard",
+        "Deux pigeons voyageurs",
+        "Un singe et un lapin"
+      ],
+      "correctIndex": 1,
+      "explanation": "Le 19 septembre 1783, un mouton, un coq et un canard ont volé à Versailles."
+    },
+    {
+      "text": "Quelle distance approximative parcourut le vol avec les animaux à Versailles ?",
+      "choices": [
+        "500 mètres",
+        "2 kilomètres",
+        "4 kilomètres",
+        "10 kilomètres"
+      ],
+      "correctIndex": 2,
+      "explanation": "Le ballon a parcouru environ 4 km avant d’atterrir."
+    },
+    {
+      "text": "Quel était le principal risque lors des premiers vols habités en Montgolfière ?",
+      "choices": [
+        "L’explosion du ballon",
+        "La combustion de l’enveloppe par le feu",
+        "La collision avec des oiseaux",
+        "Le manque d’oxygène"
+      ],
+      "correctIndex": 1,
+      "explanation": "Le feu utilisé pour chauffer l’air pouvait enflammer l’enveloppe en papier et toile."
+    },
+    {
+      "text": "Qui furent les premiers aéronautes humains d’une Montgolfière ?",
+      "choices": [
+        "Jean-François Pilâtre de Rozier et le marquis d’Arlandes",
+        "Jacques Charles et Nicolas-Louis Robert",
+        "Joseph Montgolfier et Étienne Montgolfier",
+        "Louis Blanchard et André Garnerin"
+      ],
+      "correctIndex": 0,
+      "explanation": "Pilâtre de Rozier et le marquis d’Arlandes ont réalisé le premier vol libre habité le 21 novembre 1783."
+    },
+    {
+      "text": "Combien de temps dura le premier vol libre habité en Montgolfière ?",
+      "choices": [
+        "Environ 4 minutes",
+        "Environ 10 minutes",
+        "Environ 25 minutes",
+        "Plus d’une heure"
+      ],
+      "correctIndex": 2,
+      "explanation": "Le vol de Pilâtre de Rozier et du marquis d’Arlandes a duré environ 25 minutes."
+    },
+    {
+      "text": "Quel signe de réussite les aéronautes utilisaient-ils pour rassurer la foule lors des premières ascensions ?",
+      "choices": [
+        "Ils jetaient des pièces d’or",
+        "Ils agitaient des drapeaux",
+        "Ils lançaient des feux d’artifice",
+        "Ils chantaient des hymnes"
+      ],
+      "correctIndex": 1,
+      "explanation": "Agiter des drapeaux permettait de montrer que tout se passait bien à bord."
+    },
+    {
+      "text": "Pourquoi les Montgolfières étaient-elles souvent décorées ?",
+      "choices": [
+        "Pour améliorer la portance",
+        "Pour être visibles de loin et impressionner le public",
+        "Pour identifier la propriété de l’armée",
+        "Pour empêcher l’humidité"
+      ],
+      "correctIndex": 1,
+      "explanation": "Les décorations colorées attiraient l’attention et servaient à montrer la prouesse technique."
+    },
+    {
+      "text": "Quel événement marqua la rivalité entre les Montgolfières et les ballons à gaz ?",
+      "choices": [
+        "La course de Versailles",
+        "Le vol de Jacques Charles et Nicolas-Louis Robert",
+        "La traversée de la Manche",
+        "La première ascension militaire"
+      ],
+      "correctIndex": 1,
+      "explanation": "Le vol à gaz de Jacques Charles en décembre 1783 montra une technologie concurrente aux Montgolfières."
+    },
+    {
+      "text": "Quel était le principal avantage des ballons à gaz par rapport aux Montgolfières ?",
+      "choices": [
+        "Ils coûtaient moins cher",
+        "Ils pouvaient voler plus longtemps",
+        "Ils transportaient plus de poids",
+        "Ils étaient plus faciles à réparer en vol"
+      ],
+      "correctIndex": 1,
+      "explanation": "Les ballons à gaz n’avaient pas besoin de feu constant et pouvaient rester en l’air plus longtemps."
+    },
+    {
+      "text": "Quelle expérience spectaculaire Étienne Montgolfier réalisa-t-il pour convaincre de la faisabilité ?",
+      "choices": [
+        "Il fit décoller un ballon depuis le toit d’une cathédrale",
+        "Il utilisa un feu de paille pour gonfler un ballon dans la cour de l’usine familiale",
+        "Il lâcha un ballon au-dessus de la mer",
+        "Il envoya un ballon dans une mine"
+      ],
+      "correctIndex": 1,
+      "explanation": "Étienne démontra le principe dans la cour de la papeterie familiale avec un feu de paille."
+    },
+    {
+      "text": "Quel terme employaient les frères Montgolfier pour désigner l’air chauffé ?",
+      "choices": [
+        "Air gonflant",
+        "Gaz léger",
+        "Air inflammable",
+        "Gaz montgolfique"
+      ],
+      "correctIndex": 3,
+      "explanation": "Ils parlaient d’“air montgolfique” pour l’air chaud produit par le feu."
+    },
+    {
+      "text": "Quelle altitude approximative atteignit le premier vol libre habité ?",
+      "choices": [
+        "150 mètres",
+        "500 mètres",
+        "900 mètres",
+        "1 500 mètres"
+      ],
+      "correctIndex": 2,
+      "explanation": "Le premier vol libre habité aurait culminé autour de 900 mètres."
+    },
+    {
+      "text": "Quel élément servait de combustible principal lors des premiers vols ?",
+      "choices": [
+        "Du charbon de bois",
+        "Du papier imbibé d’huile",
+        "De la paille et de la laine",
+        "Des brindilles de pin"
+      ],
+      "correctIndex": 2,
+      "explanation": "Les montgolfières utilisaient un mélange de paille et de laine pour produire une flamme abondante."
+    },
+    {
+      "text": "Comment contrôlait-on l’altitude dans les premières Montgolfières ?",
+      "choices": [
+        "En ouvrant des soupapes pour évacuer l’air",
+        "En ajoutant ou retirant du lest",
+        "En ravivant ou en atténuant le feu",
+        "En inclinant la nacelle"
+      ],
+      "correctIndex": 2,
+      "explanation": "L’intensité du feu permettait de chauffer plus ou moins l’air et donc d’ajuster l’altitude."
+    },
+    {
+      "text": "Quel artisanat fut crucial pour la fabrication des premières enveloppes ?",
+      "choices": [
+        "La papeterie",
+        "La métallurgie",
+        "La cordonnerie",
+        "La céramique"
+      ],
+      "correctIndex": 0,
+      "explanation": "Les Montgolfier étaient papetiers, un savoir-faire essentiel pour produire les enveloppes en papier."
+    },
+    {
+      "text": "Quel enseignement majeur ces premières ascensions ont-elles apporté ?",
+      "choices": [
+        "La nécessité d’une cabine pressurisée",
+        "L’importance du contrôle de l’altitude et de la sécurité du brûleur",
+        "La priorité aux vols de nuit",
+        "L’obligation d’utiliser l’hydrogène"
+      ],
+      "correctIndex": 1,
+      "explanation": "Les risques de feu et la gestion de l’altitude ont rapidement montré les besoins en sécurité et contrôle du brûleur."
+    }
+  ]
+}

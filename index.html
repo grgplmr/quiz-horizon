@@ -12,36 +12,69 @@
   </header>
 
   <main class="content">
-    <section class="modules">
-      <div class="module-card">
-        <h2>Module 1</h2>
-        <p>Découvrir les bases.</p>
-        <button>Commencer</button>
+    <section id="view-home">
+      <div class="modules">
+        <div class="module-card">
+          <h2>Aérodynamique et mécanique du vol</h2>
+          <p>Découvrir les bases.</p>
+          <button data-module="aero">Commencer</button>
+        </div>
+        <div class="module-card">
+          <h2>Connaissance des aéronefs</h2>
+          <p>Approfondir les connaissances.</p>
+          <button data-module="aeronefs">Commencer</button>
+        </div>
+        <div class="module-card">
+          <h2>Météorologie et aérologie</h2>
+          <p>Entraînement avancé.</p>
+          <button data-module="meteo">Commencer</button>
+        </div>
+        <div class="module-card">
+          <h2>Navigation, sécurité et réglementation</h2>
+          <p>Révisions ciblées.</p>
+          <button data-module="nav">Commencer</button>
+        </div>
+        <div class="module-card">
+          <h2>Histoire de l’aéronautique et de l’espace</h2>
+          <p>Questionnaires thématiques.</p>
+          <button data-module="histoire">Commencer</button>
+        </div>
+        <div class="module-card">
+          <h2>Anglais aéronautique</h2>
+          <p>Simulation complète.</p>
+          <button data-module="anglais">Commencer</button>
+        </div>
       </div>
-      <div class="module-card">
-        <h2>Module 2</h2>
-        <p>Approfondir les connaissances.</p>
-        <button>Commencer</button>
+    </section>
+
+    <section id="view-quiz" class="hidden">
+      <div class="quiz-panel">
+        <div class="quiz-header">
+          <h2 id="quiz-title">Quiz</h2>
+          <p id="quiz-progress" class="quiz-progress">Question 1 / 20</p>
+        </div>
+        <div class="quiz-question">
+          <p id="quiz-question-text">Intitulé de la question</p>
+        </div>
+        <div id="quiz-choices" class="quiz-choices"></div>
+        <div id="quiz-feedback" class="quiz-feedback"></div>
+        <div class="quiz-actions">
+          <button id="quiz-validate" class="primary">Valider</button>
+          <button id="quiz-next" class="secondary" disabled>Question suivante</button>
+        </div>
       </div>
-      <div class="module-card">
-        <h2>Module 3</h2>
-        <p>Entraînement avancé.</p>
-        <button>Commencer</button>
-      </div>
-      <div class="module-card">
-        <h2>Module 4</h2>
-        <p>Révisions ciblées.</p>
-        <button>Commencer</button>
-      </div>
-      <div class="module-card">
-        <h2>Module 5</h2>
-        <p>Questionnaires thématiques.</p>
-        <button>Commencer</button>
-      </div>
-      <div class="module-card">
-        <h2>Module 6</h2>
-        <p>Simulation complète.</p>
-        <button>Commencer</button>
+    </section>
+
+    <section id="view-result" class="hidden">
+      <div class="result-panel">
+        <h2>Résultat du quiz</h2>
+        <p id="result-score" class="result-score"></p>
+        <p id="result-percent" class="result-percent"></p>
+        <p id="result-message" class="result-message"></p>
+        <div class="result-actions">
+          <button id="result-restart" class="primary">Recommencer ce quiz</button>
+          <button id="result-home" class="secondary">Retour à l’accueil</button>
+        </div>
       </div>
     </section>
   </main>
