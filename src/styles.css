@@ -35,14 +35,35 @@ body.theme-dark {
 .app-shell {
   max-width: 1080px;
   margin: 0 auto;
-  padding: 24px 20px 48px;
+  padding: 124px 20px 48px;
 }
 
 .header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  background: #e8f0fb;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+  z-index: 20;
+  border-bottom: 1px solid #dbe8ff;
+}
+
+body.theme-dark .header {
+  background: #0b1220;
+  border-color: var(--border-dark);
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.45);
+}
+
+.header-content {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 16px 20px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
+  gap: 16px;
 }
 
 .logo {
@@ -51,6 +72,10 @@ body.theme-dark {
   display: flex;
   gap: 10px;
   align-items: center;
+}
+
+.logo-title {
+  font-size: 18px;
 }
 
 .logo .dot {
@@ -64,6 +89,38 @@ body.theme-dark {
 .muted {
   color: var(--muted);
   font-size: 14px;
+}
+
+.header-links {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.header-link {
+  color: var(--text-light);
+  text-decoration: none;
+  font-weight: 700;
+  padding: 10px 14px;
+  border-radius: 12px;
+  border: 1px solid #dbe8ff;
+  background: rgba(255, 255, 255, 0.7);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.05);
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+
+.header-link:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 14px 28px rgba(58, 167, 255, 0.18);
+}
+
+body.theme-dark .header-link {
+  color: var(--text-dark);
+  border-color: var(--border-dark);
+  background: rgba(15, 23, 42, 0.7);
+  box-shadow: none;
 }
 
 .top-actions {
@@ -341,7 +398,20 @@ body.theme-dark .stat {
 }
 
 @media (max-width: 640px) {
-  .header { flex-direction: column; align-items: flex-start; }
+  .header-content {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .header-links {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .app-shell {
+    padding-top: 164px;
+  }
+
   .btn { width: 100%; text-align: center; }
   .quiz-footer { flex-direction: column; align-items: stretch; }
 }
