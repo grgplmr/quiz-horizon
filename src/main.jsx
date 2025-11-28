@@ -259,7 +259,7 @@ function Quiz({ slug }) {
   if (status === 'error' || !quiz) return <p>Quiz introuvable</p>;
 
   if (finished) {
-    return <ResultView quiz={quiz} stats={stats} onRestart={() => {
+    return <ResultView quiz={quiz} stats={stats} answers={answers} onRestart={() => {
       clearProgress(slug);
       setQueue(quiz.questions.map((_, i) => i));
       setAnswers({});
@@ -280,7 +280,16 @@ function Quiz({ slug }) {
   const submit = () => {
     if (selected === null || feedback) return;
     const correct = Number(selected) === Number(question.answer);
-    const newAnswers = { ...answers, [currentIndex]: { choice: Number(selected), correct } };
+    const previousAnswer = answers[currentIndex];
+    const newAnswers = {
+      ...answers,
+      [currentIndex]: {
+        choice: Number(selected),
+        correct,
+        everWrong: previousAnswer?.everWrong || !correct,
+        attempts: (previousAnswer?.attempts || 0) + 1,
+      },
+    };
     setAnswers(newAnswers);
     setStats((prev) => ({
       ...prev,
@@ -366,32 +375,89 @@ function Quiz({ slug }) {
   );
 }
 
-function ResultView({ quiz, stats, onRestart }) {
-  const score = quiz.questions.length ? Math.round((stats.correct / quiz.questions.length) * 100) : 0;
+function ResultView({ quiz, stats, answers, onRestart }) {
+  const totalQuestions = quiz.questions.length;
+  const correctCount = quiz.questions.reduce((acc, _, idx) => (answers[idx]?.correct ? acc + 1 : acc), 0);
+  const score = totalQuestions ? Math.round((correctCount / totalQuestions) * 100) : 0;
+  const missedQuestions = quiz.questions
+    .map((question, idx) => ({ question, record: answers[idx] }))
+    .filter(({ record }) => record?.everWrong || record?.correct === false);
+
+  const feedbackMessage = (() => {
+    if (score >= 85) return 'Excellent, vous êtes prêt pour l\'épreuve !';
+    if (score >= 60) return 'Bon résultat, quelques notions restent à consolider.';
+    return 'Continuez à vous entraîner, vous allez progresser.';
+  })();
+
   return (
-    <div>
-      <div className="pill">Score final</div>
-      <h2 className="section-title">{quiz.title}</h2>
-      <div className="score-panel">
-        <div className="stat">
-          <div className="muted">Score</div>
-          <h3>{score}%</h3>
-        </div>
-        <div className="stat">
-          <div className="muted">Bonnes réponses</div>
-          <h3>
-            {stats.correct}/{quiz.questions.length}
-          </h3>
-        </div>
-        <div className="stat">
-          <div className="muted">Tentatives</div>
-          <h3>{stats.attempts}</h3>
+    <div className="result">
+      <div className="result-hero">
+        <div className="result-pill">Score final</div>
+        <h2 className="section-title">{quiz.title}</h2>
+        <div className="result-main-score">
+          <div className="result-score-numbers">
+            <div className="result-score-total">
+              {correctCount} / {totalQuestions}
+            </div>
+            <div className="result-score-percent">{score} %</div>
+          </div>
+          <p className="result-feedback">{feedbackMessage}</p>
         </div>
       </div>
+
+      <div className="result-visuals">
+        <div className="result-card">
+          <div className="stat-line">
+            <span className="muted">Tentatives totales</span>
+            <strong>{stats.attempts}</strong>
+          </div>
+          <div className="stat-line">
+            <span className="muted">Bonnes réponses</span>
+            <strong>
+              {correctCount} / {totalQuestions}
+            </strong>
+          </div>
+          <div className="stat-line">
+            <span className="muted">Exactitude</span>
+            <strong>{score}%</strong>
+          </div>
+        </div>
+
+        <div className="result-card result-graph">
+          <div className="muted">Graphique de progression</div>
+          <div className="graph-placeholder" aria-hidden>
+            <div className="graph-bar good" style={{ width: `${score}%` }} />
+            <div className="graph-bar bad" style={{ width: `${100 - score}%` }} />
+          </div>
+          <div className="muted" style={{ fontSize: 12 }}>Prévu : petite visualisation bonnes/mauvaises réponses</div>
+        </div>
+      </div>
+
+      {missedQuestions.length > 0 ? (
+        <div className="result-card">
+          <h3>Questions à revoir</h3>
+          <ul className="missed-list">
+            {missedQuestions.map(({ question }, idx) => (
+              <li key={idx} className="missed-item">
+                <div className="missed-question">{question.text}</div>
+                <div className="missed-answer">
+                  Bonne réponse : <strong>{question.choices[question.answer]}</strong>
+                </div>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ) : (
+        <div className="result-card">
+          <h3>Bravo !</h3>
+          <p className="muted">Aucune erreur sur ce quiz.</p>
+        </div>
+      )}
+
       <div className="top-actions">
-        <button className="btn btn-ghost" onClick={() => (window.location.hash = `#/category/${quiz.category}`)}>↩︎ Retour</button>
+        <button className="btn btn-ghost" onClick={() => (window.location.hash = '#/')}>Choisir un autre module</button>
         <button className="btn btn-primary" onClick={onRestart}>
-          Rejouer
+          Recommencer ce module
         </button>
       </div>
     </div>
