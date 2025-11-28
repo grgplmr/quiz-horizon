@@ -67,6 +67,17 @@ const Header = ({ onHome }) => (
 
 const Home = () => (
   <div className="home">
+    <div className="hero">
+      <div className="hero-heading">
+        <span className="hero-badge">Nouveau • Mis à jour décembre 2025</span>
+        <div className="hero-text">
+          <h1 className="hero-title">Prépare ton BIA avec des quiz interactifs</h1>
+          <p className="hero-subtitle">
+            6 modules officiels, questions mises à jour régulièrement, entraînement illimité et gratuit.
+          </p>
+        </div>
+      </div>
+    </div>
     <div className="pill">Catégories officielles du BIA</div>
     <h1 className="section-title">Entraîne-toi par thématique</h1>
     <p className="muted" style={{ maxWidth: 720, margin: '8px auto 0' }}>
