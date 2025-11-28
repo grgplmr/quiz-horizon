@@ -242,8 +242,11 @@ body.theme-dark .btn {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 18px;
-  margin: 28px auto 0;
-  max-width: 960px;
+  margin: 32px auto 0;
+  max-width: 1040px;
+  width: 100%;
+  grid-auto-rows: 1fr;
+  justify-items: stretch;
 }
 
 @media (max-width: 960px) {
@@ -264,12 +267,13 @@ body.theme-dark .btn {
   background: var(--card);
   border: 1px solid var(--border);
   border-radius: 16px;
-  padding: 18px 20px;
+  padding: 20px;
   display: flex;
   flex-direction: column;
   gap: 8px;
+  height: 100%;
   cursor: pointer;
-  transition: transform 0.1s ease, box-shadow 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+  transition: transform 0.12s ease, box-shadow 0.2s ease, border-color 0.2s ease, background 0.2s ease;
 }
 
 body.theme-dark .card {
@@ -279,9 +283,9 @@ body.theme-dark .card {
 }
 
 .card:hover {
-  transform: translateY(-2px);
+  transform: translateY(-2px) scale(1.02);
   border-color: var(--horizon-blue);
-  box-shadow: 0 18px 40px rgba(58, 167, 255, 0.16);
+  box-shadow: 0 18px 40px rgba(58, 167, 255, 0.2);
   background: linear-gradient(180deg, rgba(58, 167, 255, 0.04), transparent 40%);
 }
 
