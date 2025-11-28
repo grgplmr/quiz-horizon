@@ -134,6 +134,23 @@ body {
   gap: 16px;
 }
 
+.quiz-progress-band {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  padding: 10px 12px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.03);
+  margin-bottom: 4px;
+}
+
+.quiz-counter {
+  margin: 0;
+  color: var(--muted);
+  font-weight: 600;
+}
+
 .quiz-progress {
   margin: 0;
   color: var(--muted);

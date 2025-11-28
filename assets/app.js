@@ -5,6 +5,9 @@ const state = {
   score: 0,
   selectedIndex: null,
   questionValidated: false,
+  queue: [],
+  masteredIndices: new Set(),
+  totalAttempts: 0,
 };
 
 function showView(name) {
@@ -43,6 +46,10 @@ function renderCurrentQuestion() {
         <h2 class="quiz-title">${state.currentQuiz?.title || 'Quiz'}</h2>
         <p class="quiz-progress">Question ${state.currentIndex + 1} / ${total}</p>
       </div>
+      <div class="quiz-progress-band">
+        <p class="quiz-counter"><strong>Tentatives :</strong> <span id="attempt-count">${state.totalAttempts}</span></p>
+        <p class="quiz-counter"><strong>Questions maîtrisées :</strong> <span id="mastered-count">${state.masteredIndices.size}</span> / ${state.questions.length}</p>
+      </div>
       <p class="quiz-question">${question.text}</p>
       <div class="quiz-choices">${choicesHtml}</div>
       <div id="quiz-feedback" class="quiz-feedback"></div>
@@ -78,55 +85,74 @@ function handleValidate(feedbackEl, nextButton, validateButton) {
   if (state.selectedIndex === null) return;
 
   state.questionValidated = true;
+  state.totalAttempts += 1;
   const currentQuestion = state.questions[state.currentIndex];
   const isCorrect = state.selectedIndex === currentQuestion.correctIndex;
 
   if (isCorrect) {
-    state.score += 1;
-    feedbackEl.textContent = 'Bonne réponse !';
+    if (!state.masteredIndices.has(state.currentIndex)) {
+      state.masteredIndices.add(state.currentIndex);
+      state.score = state.masteredIndices.size;
+    }
+    feedbackEl.innerHTML = `Bonne réponse !${
+      currentQuestion.explanation ? `<br>${currentQuestion.explanation}` : ''
+    }`;
     feedbackEl.classList.remove('error');
     feedbackEl.classList.add('success');
   } else {
     const correctAnswer = currentQuestion.choices[currentQuestion.correctIndex];
-    feedbackEl.textContent = `Mauvaise réponse, la bonne réponse était : ${correctAnswer}`;
+    feedbackEl.innerHTML = `Mauvaise réponse, la bonne réponse était : ${correctAnswer}${
+      currentQuestion.explanation ? `<br>${currentQuestion.explanation}` : ''
+    }`;
+    state.queue.push(state.currentIndex);
     feedbackEl.classList.remove('success');
     feedbackEl.classList.add('error');
   }
 
   validateButton.disabled = true;
   nextButton.disabled = false;
+
+  const attemptCountEl = document.getElementById('attempt-count');
+  const masteredCountEl = document.getElementById('mastered-count');
+  if (attemptCountEl) {
+    attemptCountEl.textContent = state.totalAttempts;
+  }
+  if (masteredCountEl) {
+    masteredCountEl.textContent = state.masteredIndices.size;
+  }
 }
 
 function handleNextQuestion() {
   if (!state.questionValidated) return;
 
-  state.currentIndex += 1;
-  if (state.currentIndex < state.questions.length) {
-    renderCurrentQuestion();
-  } else {
+  if (state.masteredIndices.size === state.questions.length) {
     showResults();
+    return;
   }
+
+  state.currentIndex = state.queue.shift();
+
+  if (state.currentIndex === undefined) {
+    showResults();
+    return;
+  }
+
+  renderCurrentQuestion();
 }
 
 function showResults() {
   const viewResult = document.getElementById('view-result');
   const total = state.questions.length || 1;
-  const scoreOn20 = Math.round((state.score / total) * 20);
-  const percent = Math.round((state.score / total) * 100);
-
-  let message = 'Continue à t’entraîner, tu vas progresser.';
-  if (scoreOn20 >= 17) {
-    message = 'Excellent, tu es prêt pour le BIA !';
-  } else if (scoreOn20 >= 12) {
-    message = 'Bon résultat, encore quelques notions à consolider.';
-  }
+  const scoreOn20 = 20;
+  const percent = 100;
 
   viewResult.innerHTML = `
     <div class="result-panel">
       <h2>${state.currentQuiz?.title || 'Quiz'}</h2>
-      <p class="result-score">Score : ${scoreOn20} / 20</p>
-      <p class="result-percent">${percent}% de bonnes réponses</p>
-      <p class="result-message">${message}</p>
+      <p class="result-score">Bravo, tu as maîtrisé les ${total} questions !</p>
+      <p class="result-percent">Score : ${scoreOn20} / 20 (${percent}% de réussite)</p>
+      <p class="result-message">Nombre total de tentatives : ${state.totalAttempts}</p>
+      <p class="result-message">Moyenne : 20/20 après ${state.totalAttempts} questions répondues.</p>
       <div class="result-actions">
         <button id="result-restart" class="primary">Recommencer ce quiz</button>
         <button id="result-home" class="secondary">Retour à l’accueil</button>
@@ -138,8 +164,7 @@ function showResults() {
   const homeButton = document.getElementById('result-home');
 
   restartButton.addEventListener('click', () => {
-    state.currentIndex = 0;
-    state.score = 0;
+    resetQuizProgress();
     renderCurrentQuestion();
   });
 
@@ -149,6 +174,16 @@ function showResults() {
   });
 
   showView('result');
+}
+
+function resetQuizProgress() {
+  state.queue = state.questions.map((_, index) => index);
+  state.masteredIndices = new Set();
+  state.totalAttempts = 0;
+  state.score = 0;
+  state.selectedIndex = null;
+  state.questionValidated = false;
+  state.currentIndex = state.queue.shift() ?? 0;
 }
 
 async function loadQuiz(quizId) {
@@ -167,8 +202,7 @@ async function loadQuiz(quizId) {
 
     state.currentQuiz = quizMeta;
     state.questions = quizData.questions || [];
-    state.currentIndex = 0;
-    state.score = 0;
+    resetQuizProgress();
 
     renderCurrentQuestion();
   } catch (error) {
