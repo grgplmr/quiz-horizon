@@ -95,6 +95,33 @@ const Home = () => (
         </div>
       ))}
     </div>
+    <section className="how-it-works">
+      <h2 className="section-title">Comment ça marche ?</h2>
+      <div className="how-steps" role="list">
+        <div className="how-step" role="listitem">
+          <div className="step-badge">1</div>
+          <div className="step-text">Choisis un module</div>
+        </div>
+        <div className="step-separator" aria-hidden>
+          →
+        </div>
+        <div className="how-step" role="listitem">
+          <div className="step-badge">2</div>
+          <div className="step-text">Réponds aux questions</div>
+        </div>
+        <div className="step-separator" aria-hidden>
+          →
+        </div>
+        <div className="how-step" role="listitem">
+          <div className="step-badge">3</div>
+          <div className="step-text">Visualise ton score et les notions à revoir</div>
+        </div>
+      </div>
+      <p className="how-note">
+        Mode entraînement : corrections immédiates et répétition des erreurs. Mode examen blanc : résultat global en fin
+        de quiz (bientôt).
+      </p>
+    </section>
   </div>
 );
 

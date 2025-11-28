@@ -312,6 +312,93 @@ body.theme-dark .card {
   flex: 1;
 }
 
+.how-it-works {
+  margin: 48px auto 0;
+  padding: 20px;
+  background: linear-gradient(135deg, rgba(58, 167, 255, 0.06), rgba(58, 167, 255, 0.02));
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  max-width: 1040px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+body.theme-dark .how-it-works {
+  background: linear-gradient(135deg, rgba(58, 167, 255, 0.12), rgba(58, 167, 255, 0.04));
+  border-color: var(--border-dark);
+}
+
+.how-steps {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.how-step {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: white;
+  border: 1px solid var(--border);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.04);
+}
+
+body.theme-dark .how-step {
+  background: var(--card-dark);
+  border-color: var(--border-dark);
+  box-shadow: none;
+}
+
+.step-badge {
+  width: 30px;
+  height: 30px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  background: rgba(58, 167, 255, 0.15);
+  color: var(--horizon-blue-dark);
+  font-weight: 800;
+  font-size: 14px;
+}
+
+body.theme-dark .step-badge {
+  color: white;
+  background: rgba(58, 167, 255, 0.25);
+}
+
+.step-text {
+  font-weight: 700;
+  text-align: left;
+}
+
+.step-separator {
+  opacity: 0.6;
+  font-weight: 800;
+  color: var(--text-light);
+}
+
+body.theme-dark .step-separator {
+  color: var(--text-dark);
+}
+
+.how-note {
+  margin: 0 auto;
+  max-width: 820px;
+  font-size: 13px;
+  color: var(--text-light);
+}
+
+body.theme-dark .how-note {
+  color: var(--text-dark);
+}
+
 .pill {
   display: inline-flex;
   align-items: center;
