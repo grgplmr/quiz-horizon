@@ -272,7 +272,10 @@ function Quiz({ slug }) {
 
   const currentIndex = queue[0];
   const question = quiz.questions[currentIndex];
-  const progress = ((quiz.questions.length - queue.length) / quiz.questions.length) * 100;
+  const totalQuestions = quiz.questions.length;
+  const currentNumber = totalQuestions - queue.length + 1;
+  const progress = (currentNumber / totalQuestions) * 100;
+  const categoryLabel = CATEGORIES.find((c) => c.slug === quiz.category)?.label;
 
   const submit = () => {
     if (selected === null || feedback) return;
@@ -310,8 +313,19 @@ function Quiz({ slug }) {
         <span className="muted">/</span>
         <strong>{quiz.title}</strong>
       </div>
+      <div className="quiz-top">
+        <div className="quiz-top-titles">
+          <div className="quiz-module">{categoryLabel || 'Module'}</div>
+          <h2 className="quiz-name">{quiz.title}</h2>
+        </div>
+        <div className="quiz-progress">
+          <div className="quiz-counter">Question {currentNumber} / {totalQuestions}</div>
+          <div className="progress-bar compact">
+            <div className="progress-fill" style={{ width: `${progress}%` }} />
+          </div>
+        </div>
+      </div>
       <div className="question-shell">
-        <div className="pill">Question {quiz.questions.length - queue.length + 1}/{quiz.questions.length}</div>
         <h2>{question.text}</h2>
         <div className="choices">
           {question.choices.map((choice, idx) => (
@@ -346,11 +360,6 @@ function Quiz({ slug }) {
           <button className="btn btn-primary" onClick={feedback ? nextQuestion : submit}>
             {feedback ? 'Question suivante' : 'Valider'}
           </button>
-          <div style={{ flex: 1 }}>
-            <div className="progress-bar">
-              <div className="progress-fill" style={{ width: `${progress}%` }} />
-            </div>
-          </div>
         </div>
       </div>
     </div>
