@@ -1,184 +1,146 @@
-document.addEventListener('DOMContentLoaded', () => {
+const state = {
+  currentQuiz: null,
+  questions: [],
+  currentIndex: 0,
+  score: 0,
+  selectedIndex: null,
+  questionValidated: false,
+};
+
+function showView(name) {
   const homeSection = document.getElementById('view-home');
   const quizSection = document.getElementById('view-quiz');
   const resultSection = document.getElementById('view-result');
-  const startButtons = document.querySelectorAll('button[data-module]');
 
-  const quizTitle = document.getElementById('quiz-title');
-  const quizProgress = document.getElementById('quiz-progress');
-  const quizQuestionText = document.getElementById('quiz-question-text');
-  const quizChoicesContainer = document.getElementById('quiz-choices');
-  const quizFeedback = document.getElementById('quiz-feedback');
+  homeSection.classList.toggle('hidden', name !== 'home');
+  quizSection.classList.toggle('hidden', name !== 'quiz');
+  resultSection.classList.toggle('hidden', name !== 'result');
+}
+
+function renderCurrentQuestion() {
+  const viewQuiz = document.getElementById('view-quiz');
+  const question = state.questions[state.currentIndex];
+
+  if (!question) {
+    alert('Aucune question à afficher.');
+    return;
+  }
+
+  state.selectedIndex = null;
+  state.questionValidated = false;
+
+  const total = state.questions.length;
+  const choicesHtml = question.choices
+    .map(
+      (choice, index) =>
+        `<button class="choice-button" data-index="${index}">${choice}</button>`
+    )
+    .join('');
+
+  viewQuiz.innerHTML = `
+    <div class="quiz-panel">
+      <div class="quiz-header">
+        <h2 class="quiz-title">${state.currentQuiz?.title || 'Quiz'}</h2>
+        <p class="quiz-progress">Question ${state.currentIndex + 1} / ${total}</p>
+      </div>
+      <p class="quiz-question">${question.text}</p>
+      <div class="quiz-choices">${choicesHtml}</div>
+      <div id="quiz-feedback" class="quiz-feedback"></div>
+      <div class="quiz-actions">
+        <button id="quiz-validate" class="primary">Valider</button>
+        <button id="quiz-next" class="secondary" disabled>Question suivante</button>
+      </div>
+    </div>
+  `;
+
+  const feedback = document.getElementById('quiz-feedback');
   const validateButton = document.getElementById('quiz-validate');
   const nextButton = document.getElementById('quiz-next');
+  const choiceButtons = viewQuiz.querySelectorAll('.choice-button');
 
-  const resultScore = document.getElementById('result-score');
-  const resultPercent = document.getElementById('result-percent');
-  const resultMessage = document.getElementById('result-message');
-  const restartButton = document.getElementById('result-restart');
-  const homeButton = document.getElementById('result-home');
-
-  let currentQuiz = null;
-  let currentQuestions = [];
-  let currentQuestionIndex = 0;
-  let score = 0;
-  let hasValidatedCurrent = false;
-
-  function showView(view) {
-    homeSection.classList.toggle('hidden', view !== 'home');
-    quizSection.classList.toggle('hidden', view !== 'quiz');
-    resultSection.classList.toggle('hidden', view !== 'result');
-  }
-
-  function resetFeedback(message = '', type = '') {
-    quizFeedback.textContent = message;
-    quizFeedback.classList.remove('success', 'error');
-    if (type) {
-      quizFeedback.classList.add(type);
-    }
-  }
-
-  function renderQuestion() {
-    const question = currentQuestions[currentQuestionIndex];
-    if (!question) return;
-
-    quizTitle.textContent = currentQuiz?.title || 'Quiz';
-    quizProgress.textContent = `Question ${currentQuestionIndex + 1} / ${currentQuestions.length}`;
-    quizQuestionText.textContent = question.text;
-
-    quizChoicesContainer.innerHTML = '';
-    question.choices.forEach((choice, index) => {
-      const label = document.createElement('label');
-      label.className = 'quiz-choice';
-
-      const input = document.createElement('input');
-      input.type = 'radio';
-      input.name = 'quiz-choice';
-      input.value = index;
-
-      const span = document.createElement('span');
-      span.textContent = choice;
-
-      label.appendChild(input);
-      label.appendChild(span);
-      quizChoicesContainer.appendChild(label);
-    });
-
-    validateButton.disabled = false;
-    nextButton.disabled = true;
-    hasValidatedCurrent = false;
-    resetFeedback();
-  }
-
-  function showResult() {
-    showView('result');
-    const total = currentQuestions.length;
-    const percent = Math.round((score / total) * 100);
-
-    resultScore.textContent = `Score : ${score} / ${total}`;
-    resultPercent.textContent = `Soit ${percent}%`;
-
-    let message = 'Continuez vos efforts !';
-    if (score >= 17) {
-      message = 'Excellent, vous maîtrisez ce thème !';
-    } else if (score >= 12) {
-      message = 'Bon travail, encore un petit effort !';
-    }
-    resultMessage.textContent = message;
-  }
-
-  function startQuiz(quizData) {
-    currentQuiz = quizData;
-    currentQuestions = quizData.questions || [];
-    currentQuestionIndex = 0;
-    score = 0;
-
-    if (currentQuestions.length === 0) {
-      resetFeedback("Aucune question disponible pour ce quiz.", 'error');
-      return;
-    }
-
-    showView('quiz');
-    renderQuestion();
-  }
-
-  function handleValidate() {
-    if (hasValidatedCurrent) return;
-    const selected = quizChoicesContainer.querySelector('input[name="quiz-choice"]:checked');
-    if (!selected) {
-      resetFeedback('Sélectionnez une réponse avant de valider.', 'error');
-      return;
-    }
-
-    hasValidatedCurrent = true;
-    validateButton.disabled = true;
-    nextButton.disabled = false;
-
-    const selectedIndex = Number(selected.value);
-    const currentQuestion = currentQuestions[currentQuestionIndex];
-    const isCorrect = selectedIndex === currentQuestion.correctIndex;
-
-    if (isCorrect) {
-      score += 1;
-      resetFeedback('Bonne réponse !', 'success');
-    } else {
-      const correctAnswer = currentQuestion.choices[currentQuestion.correctIndex];
-      resetFeedback(`Mauvaise réponse, la bonne réponse était : ${correctAnswer}`, 'error');
-    }
-  }
-
-  function handleNext() {
-    if (!hasValidatedCurrent) return;
-
-    if (currentQuestionIndex + 1 >= currentQuestions.length) {
-      showResult();
-      return;
-    }
-
-    currentQuestionIndex += 1;
-    renderQuestion();
-  }
-
-  function loadQuizForModule(module) {
-    if (module !== 'histoire') {
-      alert('Ce module n\'est pas encore disponible. Essayez le module Histoire.');
-      return;
-    }
-
-    fetch('api/quizzes/index.json')
-      .then((response) => response.json())
-      .then((quizzes) => {
-        const quiz = quizzes.find((item) => item.module === 'histoire');
-        if (!quiz) {
-          resetFeedback('Aucun quiz disponible pour ce module.', 'error');
-          return null;
-        }
-        return fetch(`api/quizzes/${quiz.questionsFile}`).then((response) => response.json());
-      })
-      .then((quizData) => {
-        if (quizData) {
-          startQuiz(quizData);
-        }
-      })
-      .catch(() => {
-        resetFeedback('Erreur lors du chargement du quiz.', 'error');
-      });
-  }
-
-  startButtons.forEach((button) => {
+  choiceButtons.forEach((button) => {
     button.addEventListener('click', () => {
-      const module = button.getAttribute('data-module');
-      loadQuizForModule(module);
+      state.selectedIndex = Number(button.dataset.index);
+      choiceButtons.forEach((btn) => btn.classList.remove('selected'));
+      button.classList.add('selected');
+      feedback.textContent = '';
     });
   });
 
-  validateButton.addEventListener('click', handleValidate);
-  nextButton.addEventListener('click', handleNext);
+  validateButton.addEventListener('click', () => handleValidate(feedback, nextButton, validateButton));
+  nextButton.addEventListener('click', handleNextQuestion);
+
+  showView('quiz');
+}
+
+function handleValidate(feedbackEl, nextButton, validateButton) {
+  if (state.questionValidated) return;
+  if (state.selectedIndex === null) return;
+
+  state.questionValidated = true;
+  const currentQuestion = state.questions[state.currentIndex];
+  const isCorrect = state.selectedIndex === currentQuestion.correctIndex;
+
+  if (isCorrect) {
+    state.score += 1;
+    feedbackEl.textContent = 'Bonne réponse !';
+    feedbackEl.classList.remove('error');
+    feedbackEl.classList.add('success');
+  } else {
+    const correctAnswer = currentQuestion.choices[currentQuestion.correctIndex];
+    feedbackEl.textContent = `Mauvaise réponse, la bonne réponse était : ${correctAnswer}`;
+    feedbackEl.classList.remove('success');
+    feedbackEl.classList.add('error');
+  }
+
+  validateButton.disabled = true;
+  nextButton.disabled = false;
+}
+
+function handleNextQuestion() {
+  if (!state.questionValidated) return;
+
+  state.currentIndex += 1;
+  if (state.currentIndex < state.questions.length) {
+    renderCurrentQuestion();
+  } else {
+    showResults();
+  }
+}
+
+function showResults() {
+  const viewResult = document.getElementById('view-result');
+  const total = state.questions.length || 1;
+  const scoreOn20 = Math.round((state.score / total) * 20);
+  const percent = Math.round((state.score / total) * 100);
+
+  let message = 'Continue à t’entraîner, tu vas progresser.';
+  if (scoreOn20 >= 17) {
+    message = 'Excellent, tu es prêt pour le BIA !';
+  } else if (scoreOn20 >= 12) {
+    message = 'Bon résultat, encore quelques notions à consolider.';
+  }
+
+  viewResult.innerHTML = `
+    <div class="result-panel">
+      <h2>${state.currentQuiz?.title || 'Quiz'}</h2>
+      <p class="result-score">Score : ${scoreOn20} / 20</p>
+      <p class="result-percent">${percent}% de bonnes réponses</p>
+      <p class="result-message">${message}</p>
+      <div class="result-actions">
+        <button id="result-restart" class="primary">Recommencer ce quiz</button>
+        <button id="result-home" class="secondary">Retour à l’accueil</button>
+      </div>
+    </div>
+  `;
+
+  const restartButton = document.getElementById('result-restart');
+  const homeButton = document.getElementById('result-home');
 
   restartButton.addEventListener('click', () => {
-    if (currentQuiz) {
-      startQuiz(currentQuiz);
-    }
+    state.currentIndex = 0;
+    state.score = 0;
+    renderCurrentQuestion();
   });
 
   homeButton.addEventListener('click', () => {
@@ -186,5 +148,49 @@ document.addEventListener('DOMContentLoaded', () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   });
 
+  showView('result');
+}
+
+async function loadQuiz(quizId) {
+  try {
+    const indexResponse = await fetch('api/quizzes/index.json');
+    const quizzes = await indexResponse.json();
+    const quizMeta = quizzes.find((entry) => entry.id === quizId);
+
+    if (!quizMeta) {
+      alert('Quiz introuvable.');
+      return;
+    }
+
+    const questionsResponse = await fetch(`api/quizzes/${quizMeta.questionsFile}`);
+    const quizData = await questionsResponse.json();
+
+    state.currentQuiz = quizMeta;
+    state.questions = quizData.questions || [];
+    state.currentIndex = 0;
+    state.score = 0;
+
+    renderCurrentQuestion();
+  } catch (error) {
+    alert('Erreur lors du chargement du quiz.');
+  }
+}
+
+function setupHome() {
+  const startButtons = document.querySelectorAll('button[data-module]');
+  startButtons.forEach((button) => {
+    button.addEventListener('click', () => {
+      const module = button.dataset.module;
+      if (module === 'histoire') {
+        loadQuiz('histoire-1');
+      } else {
+        alert('Quiz en cours de préparation');
+      }
+    });
+  });
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  setupHome();
   showView('home');
 });
