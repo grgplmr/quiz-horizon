@@ -523,7 +523,7 @@ body.theme-dark .quiz-counter {
   background: var(--card);
   border: 1px solid var(--border);
   border-radius: 16px;
-  padding: 20px;
+  padding: 24px;
 }
 
 .back-link {
@@ -545,21 +545,40 @@ body.theme-dark .question-shell {
   border-color: var(--border-dark);
 }
 
+.question-title {
+  background: linear-gradient(135deg, rgba(58, 167, 255, 0.06), rgba(255, 255, 255, 0.92));
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 18px 20px;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6);
+}
+
+body.theme-dark .question-title {
+  background: linear-gradient(135deg, rgba(58, 167, 255, 0.16), rgba(30, 41, 59, 0.92));
+  border-color: var(--border-dark);
+  box-shadow: none;
+}
+
+.question-title h2 {
+  margin: 0;
+  font-size: 22px;
+  line-height: 1.5;
+}
+
 .choices {
   display: grid;
   gap: 12px;
+  width: 100%;
 }
 
 .choice {
   border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 12px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  background: white;
+  border-radius: 14px;
+  padding: 6px;
+  background: #f8fbff;
   cursor: pointer;
-  transition: border-color 0.15s ease, transform 0.1s ease;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.1s ease, background 0.15s ease;
+  width: 100%;
 }
 
 body.theme-dark .choice {
@@ -567,8 +586,45 @@ body.theme-dark .choice {
   border-color: var(--border-dark);
 }
 
+.choice-inner {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px 14px;
+  width: 100%;
+}
+
 .choice input {
   accent-color: var(--horizon-blue);
+  margin-top: 2px;
+}
+
+.choice-text {
+  font-weight: 700;
+  line-height: 1.5;
+}
+
+.choice:hover {
+  border-color: var(--horizon-blue);
+  box-shadow: 0 10px 24px rgba(58, 167, 255, 0.12);
+  transform: translateY(-1px);
+  background: white;
+}
+
+body.theme-dark .choice:hover {
+  background: rgba(58, 167, 255, 0.08);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.35);
+}
+
+.choice.selected {
+  border-color: var(--horizon-blue);
+  background: rgba(58, 167, 255, 0.08);
+  box-shadow: 0 8px 18px rgba(58, 167, 255, 0.14);
+}
+
+body.theme-dark .choice.selected {
+  background: rgba(58, 167, 255, 0.14);
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.35);
 }
 
 .choice.correct {
