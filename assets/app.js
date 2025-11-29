@@ -453,14 +453,22 @@ function setupHeader() {
 
   header.classList.add('app-header');
 
+  let title = header.querySelector('h1');
+  if (!title) {
+    title = document.createElement('h1');
+    header.appendChild(title);
+  }
+  title.className = 'app-title';
+  title.textContent = 'HorizonBIA Quiz';
+
   let adminLink = header.querySelector('.admin-link');
   if (!adminLink) {
     adminLink = document.createElement('a');
-    adminLink.href = '/admin/';
-    adminLink.className = 'admin-link';
-    adminLink.textContent = 'Connexion admin';
     header.appendChild(adminLink);
   }
+  adminLink.href = '/admin/';
+  adminLink.className = 'admin-link';
+  adminLink.textContent = 'Admin';
 }
 
 document.addEventListener('DOMContentLoaded', () => {
