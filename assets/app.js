@@ -1,13 +1,8 @@
 const MODULES = [
   {
-    slug: 'aero',
-    label: 'Aérodynamique et mécanique du vol',
-    description: 'Découvrir les bases.',
-  },
-  {
-    slug: 'aeronefs',
-    label: 'Connaissance des aéronefs',
-    description: 'Approfondir les connaissances.',
+    slug: 'histoire',
+    label: 'Histoire de l’aéronautique et de l’espace',
+    description: 'Questionnaires thématiques.',
   },
   {
     slug: 'meteo',
@@ -15,14 +10,19 @@ const MODULES = [
     description: 'Entraînement avancé.',
   },
   {
-    slug: 'nav',
+    slug: 'aero',
+    label: 'Aérodynamique et mécanique du vol',
+    description: 'Découvrir les bases.',
+  },
+  {
+    slug: 'navigation',
     label: 'Navigation, sécurité et réglementation',
     description: 'Révisions ciblées.',
   },
   {
-    slug: 'histoire',
-    label: 'Histoire de l’aéronautique et de l’espace',
-    description: 'Questionnaires thématiques.',
+    slug: 'aeronefs',
+    label: 'Connaissance des aéronefs',
+    description: 'Approfondir les connaissances.',
   },
   {
     slug: 'anglais',
@@ -438,6 +438,19 @@ async function prepareModuleSelection(moduleSlug) {
 }
 
 function setupHome() {
+  const modulesContainer = document.querySelector('.modules');
+  if (modulesContainer) {
+    modulesContainer.innerHTML = MODULES.map(
+      (module) => `
+        <div class="module-card">
+          <h2>${module.label}</h2>
+          <p>${module.description}</p>
+          <button data-module="${module.slug}">Commencer</button>
+        </div>
+      `
+    ).join('');
+  }
+
   const startButtons = document.querySelectorAll('button[data-module]');
   startButtons.forEach((button) => {
     button.addEventListener('click', async () => {
