@@ -447,9 +447,26 @@ function setupHome() {
   });
 }
 
+function setupHeader() {
+  const header = document.querySelector('header.site-header');
+  if (!header) return;
+
+  header.classList.add('app-header');
+
+  let adminLink = header.querySelector('.admin-link');
+  if (!adminLink) {
+    adminLink = document.createElement('a');
+    adminLink.href = '/admin/';
+    adminLink.className = 'admin-link';
+    adminLink.textContent = 'Connexion admin';
+    header.appendChild(adminLink);
+  }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   ensureModuleView();
   ensureQuizzesLoaded();
   setupHome();
+  setupHeader();
   showView('home');
 });
