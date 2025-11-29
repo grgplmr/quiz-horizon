@@ -1,4 +1,38 @@
+const MODULES = [
+  {
+    slug: 'aero',
+    label: 'Aérodynamique et mécanique du vol',
+    description: 'Découvrir les bases.',
+  },
+  {
+    slug: 'aeronefs',
+    label: 'Connaissance des aéronefs',
+    description: 'Approfondir les connaissances.',
+  },
+  {
+    slug: 'meteo',
+    label: 'Météorologie et aérologie',
+    description: 'Entraînement avancé.',
+  },
+  {
+    slug: 'nav',
+    label: 'Navigation, sécurité et réglementation',
+    description: 'Révisions ciblées.',
+  },
+  {
+    slug: 'histoire',
+    label: 'Histoire de l’aéronautique et de l’espace',
+    description: 'Questionnaires thématiques.',
+  },
+  {
+    slug: 'anglais',
+    label: 'Anglais aéronautique',
+    description: 'Simulation complète.',
+  },
+];
+
 const state = {
+  view: 'home',
   currentQuiz: null,
   questions: [],
   currentIndex: 0,
@@ -10,16 +44,161 @@ const state = {
   totalAttempts: 0,
   mode: 'training',
   answers: [],
+  allQuizzes: [],
+  selectedModule: null,
+  moduleQuizzes: [],
 };
 
 function showView(name) {
   const homeSection = document.getElementById('view-home');
+  const moduleSection = document.getElementById('view-module');
   const quizSection = document.getElementById('view-quiz');
   const resultSection = document.getElementById('view-result');
 
+  state.view = name;
+
   homeSection.classList.toggle('hidden', name !== 'home');
+  moduleSection?.classList.toggle('hidden', name !== 'module');
   quizSection.classList.toggle('hidden', name !== 'quiz');
   resultSection.classList.toggle('hidden', name !== 'result');
+}
+
+function ensureModuleView() {
+  let moduleSection = document.getElementById('view-module');
+  if (!moduleSection) {
+    moduleSection = document.createElement('section');
+    moduleSection.id = 'view-module';
+    moduleSection.classList.add('hidden');
+
+    const main = document.querySelector('main.content');
+    const quizSection = document.getElementById('view-quiz');
+    main.insertBefore(moduleSection, quizSection);
+  }
+
+  return moduleSection;
+}
+
+function resetModuleSelection() {
+  state.selectedModule = null;
+  state.moduleQuizzes = [];
+}
+
+async function ensureQuizzesLoaded() {
+  if (state.allQuizzes.length) return state.allQuizzes;
+
+  try {
+    const response = await fetch('api/quizzes/index.json');
+    const quizzes = await response.json();
+    state.allQuizzes = quizzes;
+    return quizzes;
+  } catch (error) {
+    alert('Erreur lors du chargement de la liste des quiz.');
+    return [];
+  }
+}
+
+async function loadQuizFromMeta(quizMeta) {
+  if (!quizMeta) return;
+
+  const questionsFile = quizMeta.questionsFile || quizMeta.file;
+
+  if (!questionsFile) {
+    alert('Le fichier du quiz est introuvable.');
+    return;
+  }
+
+  try {
+    const questionsResponse = await fetch(`api/quizzes/${questionsFile}`);
+    const quizData = await questionsResponse.json();
+
+    state.currentQuiz = quizMeta;
+    state.questions = quizData.questions || [];
+    resetQuizProgress();
+
+    renderCurrentQuestion();
+  } catch (error) {
+    alert('Erreur lors du chargement du quiz.');
+  }
+}
+
+async function startQuizFromMeta(quizMeta) {
+  if (!quizMeta) return;
+
+  const isTraining = window.confirm(
+    "Choisis ton mode :\n\nOK = Mode entraînement (répétition des erreurs jusqu'à 20/20)\nAnnuler = Mode examen blanc (correction à la fin seulement)"
+  );
+
+  if (isTraining === null) return;
+
+  if (!isTraining) {
+    const confirmExam = window.confirm('Lancer en mode examen blanc ?');
+    if (!confirmExam) return;
+  }
+
+  state.mode = isTraining ? 'training' : 'exam';
+  await loadQuizFromMeta(quizMeta);
+}
+
+function goHome() {
+  resetModuleSelection();
+  showView('home');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function renderModuleView() {
+  const moduleSection = ensureModuleView();
+
+  if (!state.selectedModule) {
+    goHome();
+    return;
+  }
+
+  const quizzes = state.moduleQuizzes;
+  const cards = quizzes
+    .map(
+      (quiz, index) => `
+        <div class="quiz-card">
+          <div class="quiz-card-header">
+            <h3>#${index + 1} – ${quiz.title}</h3>
+            <p class="quiz-card-desc">${quiz.description || ''}</p>
+          </div>
+          <button class="primary" data-quiz-id="${quiz.id}">Commencer</button>
+        </div>
+      `
+    )
+    .join('');
+
+  moduleSection.innerHTML = `
+    <div class="breadcrumb-back">
+      <button id="back-to-modules" class="secondary">← Retour aux modules</button>
+    </div>
+    <div class="module-header">
+      <h2>${state.selectedModule.label}</h2>
+      <p class="module-subtitle">Choisissez un quiz pour ce module.</p>
+    </div>
+    ${
+      quizzes.length
+        ? `<div class="quiz-list-grid">${cards}</div>`
+        : '<p class="empty-state">Aucun quiz disponible pour ce module pour le moment.</p>'
+    }
+  `;
+
+  const backButton = document.getElementById('back-to-modules');
+  backButton.addEventListener('click', () => {
+    goHome();
+  });
+
+  const startButtons = moduleSection.querySelectorAll('[data-quiz-id]');
+  startButtons.forEach((button) => {
+    button.addEventListener('click', () => {
+      const quizId = button.dataset.quizId;
+      const quizMeta = quizzes.find((quiz) => quiz.id === quizId);
+      startQuizFromMeta(quizMeta);
+    });
+  });
+
+  showView('module');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 function renderCurrentQuestion() {
@@ -219,23 +398,12 @@ function showResults() {
   const homeButton = document.getElementById('result-home');
 
   restartButton.addEventListener('click', () => {
-    if (state.mode === 'exam' && state.currentQuiz?.id === 'histoire-1') {
-      const isTraining = window.confirm(
-        "Choisis ton mode :\n\nOK = Mode entraînement (répétition des erreurs jusqu'à 20/20)\nAnnuler = Mode examen blanc (correction à la fin seulement)"
-      );
-
-      state.mode = isTraining ? 'training' : 'exam';
-      loadQuiz('histoire-1');
-      return;
-    }
-
-    resetQuizProgress();
-    renderCurrentQuestion();
+    if (!state.currentQuiz) return;
+    startQuizFromMeta(state.currentQuiz);
   });
 
   homeButton.addEventListener('click', () => {
-    showView('home');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    goHome();
   });
 
   showView('result');
@@ -254,49 +422,34 @@ function resetQuizProgress() {
   state.currentIndex = state.queue.shift() ?? 0;
 }
 
-async function loadQuiz(quizId) {
-  try {
-    const indexResponse = await fetch('api/quizzes/index.json');
-    const quizzes = await indexResponse.json();
-    const quizMeta = quizzes.find((entry) => entry.id === quizId);
+async function prepareModuleSelection(moduleSlug) {
+  const quizzes = await ensureQuizzesLoaded();
+  const moduleInfo = MODULES.find((entry) => entry.slug === moduleSlug);
 
-    if (!quizMeta) {
-      alert('Quiz introuvable.');
-      return;
-    }
-
-    const questionsResponse = await fetch(`api/quizzes/${quizMeta.questionsFile}`);
-    const quizData = await questionsResponse.json();
-
-    state.currentQuiz = quizMeta;
-    state.questions = quizData.questions || [];
-    resetQuizProgress();
-
-    renderCurrentQuestion();
-  } catch (error) {
-    alert('Erreur lors du chargement du quiz.');
+  if (!moduleInfo) {
+    alert('Module introuvable.');
+    return;
   }
+
+  state.selectedModule = moduleInfo;
+  state.moduleQuizzes = quizzes.filter((quiz) => quiz.module === moduleSlug);
+
+  renderModuleView();
 }
 
 function setupHome() {
   const startButtons = document.querySelectorAll('button[data-module]');
   startButtons.forEach((button) => {
-    button.addEventListener('click', () => {
-      const module = button.dataset.module;
-      if (module === 'histoire') {
-        const isTraining = window.confirm(
-          "Choisis ton mode :\n\nOK = Mode entraînement (répétition des erreurs jusqu'à 20/20)\nAnnuler = Mode examen blanc (correction à la fin seulement)"
-        );
-        state.mode = isTraining ? 'training' : 'exam';
-        loadQuiz('histoire-1');
-      } else {
-        alert('Quiz en cours de préparation');
-      }
+    button.addEventListener('click', async () => {
+      const moduleSlug = button.dataset.module;
+      await prepareModuleSelection(moduleSlug);
     });
   });
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+  ensureModuleView();
+  ensureQuizzesLoaded();
   setupHome();
   showView('home');
 });
