@@ -29,6 +29,7 @@ body {
 }
 
 .site-header {
+  position: relative;
   padding: 24px;
   text-align: center;
   background: rgba(22, 27, 34, 0.8);
@@ -36,10 +37,51 @@ body {
   backdrop-filter: blur(6px);
 }
 
+.app-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
 .site-header h1 {
   margin: 0;
   font-size: clamp(1.75rem, 4vw, 2.5rem);
   letter-spacing: 0.02em;
+}
+
+.admin-link {
+  position: absolute;
+  top: 50%;
+  right: 24px;
+  transform: translateY(-50%);
+  font-size: 0.85rem;
+  padding: 0.35rem 0.75rem;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  color: rgba(230, 237, 243, 0.8);
+  background: rgba(255, 255, 255, 0.04);
+  text-decoration: none;
+  transition: color 150ms ease, background 150ms ease, border-color 150ms ease;
+}
+
+.admin-link:hover,
+.admin-link:focus-visible {
+  background: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.45);
+}
+
+@media (max-width: 640px) {
+  .app-header {
+    flex-direction: column;
+  }
+
+  .admin-link {
+    position: static;
+    transform: none;
+    margin-top: 8px;
+  }
 }
 
 .content {
