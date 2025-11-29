@@ -24,6 +24,28 @@ body {
   padding: 32px 24px 56px;
 }
 
+.admin-topbar {
+  width: min(1200px, 96vw);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 12px 18px;
+  margin-bottom: 16px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.24);
+}
+
+.admin-topbar-brand {
+  font-weight: 700;
+  font-size: 15px;
+  letter-spacing: 0.01em;
+  color: var(--muted);
+}
+
 .page-auth { align-items: center; }
 
 .login-wrapper,
@@ -119,6 +141,27 @@ a.ghost {
   background: transparent;
   border: 1px solid var(--border);
   color: var(--muted);
+}
+
+.btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.02);
+  color: var(--text);
+  font-weight: 600;
+  text-decoration: none;
+  transition: color 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.btn-ghost:hover {
+  color: var(--accent);
+  background: rgba(62, 166, 255, 0.08);
+  border-color: rgba(62, 166, 255, 0.4);
 }
 
 a.primary { width: fit-content; }

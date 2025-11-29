@@ -58,6 +58,10 @@ if (isset($_GET['import'])) {
   <link rel="stylesheet" href="admin.css">
 </head>
 <body>
+  <header class="admin-topbar">
+    <span class="admin-topbar-brand">HorizonBIA · Admin</span>
+    <a class="btn-ghost" href="../">← Retour aux quiz</a>
+  </header>
   <header class="admin-header">
     <div>
       <p class="eyebrow">HorizonBIA · Admin</p>
