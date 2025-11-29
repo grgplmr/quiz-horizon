@@ -53,6 +53,18 @@ form {
   gap: 12px;
 }
 
+.form-grid {
+  display: grid;
+  gap: 14px;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+}
+
+.form-control {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
 label {
   font-weight: 700;
   letter-spacing: 0.01em;
@@ -71,6 +83,15 @@ label {
 }
 
 input {
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: #0f141a;
+  color: var(--text);
+}
+
+select,
+input[type="file"] {
   padding: 10px 12px;
   border-radius: 10px;
   border: 1px solid rgba(255, 255, 255, 0.15);
