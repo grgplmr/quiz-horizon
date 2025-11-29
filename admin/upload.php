@@ -29,12 +29,43 @@ if (!in_array($module, $allowedModules, true)) {
     redirect_error('Module invalide.');
 }
 
-if ($quizId === '' || !preg_match('/^[a-z0-9_-]+$/i', $quizId)) {
-    redirect_error('ID du quiz invalide.');
+$quizDir = __DIR__ . '/../api/quizzes';
+$indexPath = $quizDir . '/index.json';
+$indexData = [];
+
+if (file_exists($indexPath)) {
+    $indexRaw = file_get_contents($indexPath);
+    $indexData = json_decode($indexRaw, true);
+    if (!is_array($indexData)) {
+        redirect_error('Index JSON illisible.');
+    }
 }
 
-if ($title === '') {
-    redirect_error('Le titre est requis.');
+if ($quizId === '') {
+    $highest = 0;
+
+    foreach ($indexData as $item) {
+        if (!isset($item['id'])) {
+            continue;
+        }
+
+        if (preg_match('/^' . preg_quote($module, '/') . '-(\d+)$/', $item['id'], $matches)) {
+            $highest = max($highest, (int) $matches[1]);
+        }
+    }
+
+    foreach (glob($quizDir . '/' . $module . '-*.json') ?: [] as $filePath) {
+        $base = basename($filePath);
+        if (preg_match('/^' . preg_quote($module, '/') . '-(\d+)\.json$/', $base, $matches)) {
+            $highest = max($highest, (int) $matches[1]);
+        }
+    }
+
+    $quizId = $module . '-' . ($highest + 1);
+}
+
+if (!preg_match('/^[a-z0-9_-]+$/i', $quizId)) {
+    redirect_error('ID du quiz invalide.');
 }
 
 $tmpPath = $_FILES['csv_file']['tmp_name'];
@@ -45,14 +76,38 @@ if ($handle === false) {
 
 $questions = [];
 $rowNumber = 0;
+$csvTitle = null;
+$csvDescription = null;
 
 while (($row = fgetcsv($handle, 0, ';')) !== false) {
     $rowNumber++;
-    if ($rowNumber === 1 && isset($row[0]) && stripos($row[0], 'question') !== false) {
+    $firstCell = trim($row[0] ?? '');
+    if ($rowNumber === 1 && $firstCell !== '' && stripos($firstCell, 'question') !== false) {
         continue;
     }
 
     if (count(array_filter($row, fn($cell) => $cell !== '' && $cell !== null)) === 0) {
+        continue;
+    }
+
+    if (str_starts_with($firstCell, '#')) {
+        $key = strtolower(ltrim($firstCell, "# \t"));
+        $value = trim($row[1] ?? '');
+
+        if ($key === 'title') {
+            if ($value !== '') {
+                $csvTitle = $value;
+            }
+            continue;
+        }
+
+        if ($key === 'description') {
+            if ($value !== '') {
+                $csvDescription = $value;
+            }
+            continue;
+        }
+
         continue;
     }
 
@@ -86,6 +141,17 @@ if (count($questions) !== 20) {
     redirect_error('Le CSV doit contenir 20 questions.');
 }
 
+$title = $csvTitle ?? $title;
+$description = $csvDescription ?? $description;
+
+if ($title === '') {
+    redirect_error('Le titre est requis (formulaire ou CSV).');
+}
+
+if ($description === '') {
+    redirect_error('La description est requise (formulaire ou CSV).');
+}
+
 $quizData = [
     'id' => $quizId,
     'module' => $module,
@@ -97,17 +163,6 @@ $quizData = [
 $jsonPath = __DIR__ . '/../api/quizzes/' . $quizId . '.json';
 if (file_put_contents($jsonPath, json_encode($quizData, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE)) === false) {
     redirect_error('Échec d\'écriture du fichier JSON.');
-}
-
-$indexPath = __DIR__ . '/../api/quizzes/index.json';
-$indexData = [];
-
-if (file_exists($indexPath)) {
-    $indexRaw = file_get_contents($indexPath);
-    $indexData = json_decode($indexRaw, true);
-    if (!is_array($indexData)) {
-        redirect_error('Index JSON illisible.');
-    }
 }
 
 $entry = [
