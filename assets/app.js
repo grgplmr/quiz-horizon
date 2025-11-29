@@ -466,7 +466,7 @@ function setupHeader() {
     adminLink = document.createElement('a');
     header.appendChild(adminLink);
   }
-  adminLink.href = '/admin/';
+  adminLink.href = '/admin/login.php';
   adminLink.className = 'admin-link';
   adminLink.textContent = 'Admin';
 }
