@@ -139,17 +139,17 @@ if (isset($_GET['import'])) {
     </section>
 
     <section class="card">
-      <div class="section-header">
-        <div>
+        <div class="section-header">
+          <div>
           <p class="eyebrow">Import CSV</p>
           <h3>Importer un nouveau quiz</h3>
           <p class="subtitle">Téléversez un fichier CSV pour générer un quiz JSON.</p>
-        </div>
-        <div class="input-row">
+          </div>
+          <div class="input-row">
           <a class="ghost" href="template.csv">Voir le modèle CSV</a>
-          <p class="helper">Le CSV peut inclure <code>#title;Titre du quiz</code> et <code>#description;Description courte</code>.</p>
+          <p class="helper">Format CSV attendu : en-tête <code>title;description;question;choix1;choix2;choix3;choix4;bonne_reponse(1-4);explication</code>, puis une ligne par question. La première ligne de question peut inclure le titre et la description du quiz. L'ancien format avec <code>#title</code> / <code>#description</code> reste accepté.</p>
+          </div>
         </div>
-      </div>
 
       <form action="upload.php" method="POST" enctype="multipart/form-data" class="import-form">
         <div class="form-grid">
@@ -172,13 +172,13 @@ if (isset($_GET['import'])) {
           <div class="form-control">
             <label for="title">Titre</label>
             <input type="text" id="title" name="title" placeholder="Quiz Histoire #2">
-            <p class="input-hint">Optionnel : peut aussi être fourni dans le CSV avec <code>#title;Titre du quiz</code>.</p>
+            <p class="input-hint">Optionnel : utilisé si les colonnes <code>title</code>/<code>description</code> sont vides dans le CSV ou si l'ancien format <code>#title</code> est absent.</p>
           </div>
 
           <div class="form-control">
             <label for="description">Description courte</label>
             <input type="text" id="description" name="description" placeholder="20 questions pour réviser">
-            <p class="input-hint">Optionnel : peut aussi être fournie dans le CSV avec <code>#description;Texte.</code></p>
+            <p class="input-hint">Optionnel : sert de secours si la colonne <code>description</code> ou la ligne <code>#description</code> n'est pas renseignée.</p>
           </div>
 
           <div class="form-control">

@@ -74,82 +74,165 @@ if ($handle === false) {
     redirect_error('Impossible de lire le fichier CSV.');
 }
 
+$headerRow = fgetcsv($handle, 0, ';');
+if ($headerRow === false) {
+    redirect_error('Fichier CSV vide.');
+}
+
+$normalizedHeader = array_map(fn($cell) => strtolower(trim((string) $cell)), $headerRow);
+$expectedHeader = [
+    'title',
+    'description',
+    'question',
+    'choix1',
+    'choix2',
+    'choix3',
+    'choix4',
+    'bonne_reponse(1-4)',
+    'explication',
+];
+
 $questions = [];
-$rowNumber = 0;
 $csvTitle = null;
 $csvDescription = null;
 
-while (($row = fgetcsv($handle, 0, ';')) !== false) {
-    $rowNumber++;
-    $firstCell = trim($row[0] ?? '');
-    if ($rowNumber === 1 && $firstCell !== '' && stripos($firstCell, 'question') !== false) {
-        continue;
+if ($normalizedHeader === $expectedHeader) {
+    $lineNumber = 1;
+
+    while (($row = fgetcsv($handle, 0, ';')) !== false) {
+        $lineNumber++;
+
+        $rowTitle = $row[0] ?? '';
+        $rowDescription = $row[1] ?? '';
+        $qText = $row[2] ?? '';
+        $c1 = $row[3] ?? '';
+        $c2 = $row[4] ?? '';
+        $c3 = $row[5] ?? '';
+        $c4 = $row[6] ?? '';
+        $bonneRaw = $row[7] ?? '';
+        $explicationRaw = $row[8] ?? '';
+
+        if ($title === '' && trim($rowTitle) !== '') {
+            $title = trim($rowTitle);
+        }
+
+        if ($description === '' && trim($rowDescription) !== '') {
+            $description = trim($rowDescription);
+        }
+
+        if (count(array_filter($row, fn($cell) => trim((string) $cell) !== '')) === 0) {
+            continue;
+        }
+
+        $qText = trim($qText);
+        if ($qText === '') {
+            continue;
+        }
+
+        if (trim($c1) === '' && trim($c2) === '' && trim($c3) === '' && trim($c4) === '') {
+            redirect_error('Ligne ' . $lineNumber . ' : question ou choix manquant.');
+        }
+
+        $bonne = (int) trim((string) $bonneRaw);
+        if (!in_array($bonne, [1, 2, 3, 4], true)) {
+            redirect_error('Ligne ' . $lineNumber . ' : bonne_reponse(1-4) invalide (doit être 1,2,3 ou 4).');
+        }
+
+        $questions[] = [
+            'text' => $qText,
+            'choices' => [$c1, $c2, $c3, $c4],
+            'correctIndex' => $bonne - 1,
+            'explanation' => $explicationRaw,
+        ];
+    }
+} else {
+    $rowNumber = 0;
+    $sawMetaMarkers = false;
+    $rows = [$headerRow];
+
+    while (($row = fgetcsv($handle, 0, ';')) !== false) {
+        $rows[] = $row;
     }
 
-    if (count(array_filter($row, fn($cell) => $cell !== '' && $cell !== null)) === 0) {
-        continue;
-    }
+    foreach ($rows as $row) {
+        $rowNumber++;
+        $firstCell = trim($row[0] ?? '');
 
-    if (str_starts_with($firstCell, '#')) {
-        $key = strtolower(ltrim($firstCell, "# \t"));
-        $value = trim($row[1] ?? '');
+        if ($rowNumber === 1 && $firstCell !== '' && stripos($firstCell, 'question') !== false) {
+            $sawMetaMarkers = true;
+            continue;
+        }
 
-        if ($key === 'title') {
-            if ($value !== '') {
+        if (count(array_filter($row, fn($cell) => $cell !== '' && $cell !== null)) === 0) {
+            continue;
+        }
+
+        if (str_starts_with($firstCell, '#')) {
+            $sawMetaMarkers = true;
+            $key = strtolower(ltrim($firstCell, "# \t"));
+            $value = trim($row[1] ?? '');
+
+            if ($key === 'title' && $value !== '') {
                 $csvTitle = $value;
             }
-            continue;
-        }
 
-        if ($key === 'description') {
-            if ($value !== '') {
+            if ($key === 'description' && $value !== '') {
                 $csvDescription = $value;
             }
+
             continue;
         }
 
-        continue;
+        $sawMetaMarkers = true;
+        $questionText = $row[0] ?? '';
+        $choice1 = $row[1] ?? '';
+        $choice2 = $row[2] ?? '';
+        $choice3 = $row[3] ?? '';
+        $choice4 = $row[4] ?? '';
+        $correct = (int) ($row[5] ?? 0);
+        $explanation = $row[6] ?? '';
+
+        if ($questionText === '' || $choice1 === '' || $choice2 === '' || $choice3 === '' || $choice4 === '') {
+            redirect_error('Ligne ' . $rowNumber . ' : question ou choix manquant.');
+        }
+
+        if (!in_array($correct, [1, 2, 3, 4], true)) {
+            redirect_error('Ligne ' . $rowNumber . ' : réponse correcte invalide (attendu 1-4).');
+        }
+
+        $questions[] = [
+            'text' => $questionText,
+            'choices' => [$choice1, $choice2, $choice3, $choice4],
+            'correctIndex' => $correct - 1,
+            'explanation' => $explanation,
+        ];
     }
 
-    $questionText = $row[0] ?? '';
-    $choice1 = $row[1] ?? '';
-    $choice2 = $row[2] ?? '';
-    $choice3 = $row[3] ?? '';
-    $choice4 = $row[4] ?? '';
-    $correct = (int)($row[5] ?? 0);
-    $explanation = $row[6] ?? '';
-
-    if ($questionText === '' || $choice1 === '' || $choice2 === '' || $choice3 === '' || $choice4 === '') {
-        redirect_error('Ligne ' . $rowNumber . ' : question ou choix manquant.');
+    if (!$sawMetaMarkers) {
+        redirect_error('Format CSV invalide (en-tête inconnu).');
     }
-
-    if (!in_array($correct, [1, 2, 3, 4], true)) {
-        redirect_error('Ligne ' . $rowNumber . ' : réponse correcte invalide (attendu 1-4).');
-    }
-
-    $questions[] = [
-        'text' => $questionText,
-        'choices' => [$choice1, $choice2, $choice3, $choice4],
-        'correctIndex' => $correct - 1,
-        'explanation' => $explanation,
-    ];
 }
 
 fclose($handle);
 
-if (count($questions) !== 20) {
-    redirect_error('Le CSV doit contenir 20 questions.');
+if ($csvTitle !== null && $csvTitle !== '') {
+    $title = $csvTitle;
 }
 
-$title = $csvTitle ?? $title;
-$description = $csvDescription ?? $description;
+if ($csvDescription !== null && $csvDescription !== '') {
+    $description = $csvDescription;
+}
 
 if ($title === '') {
-    redirect_error('Le titre est requis (formulaire ou CSV).');
+    redirect_error('Titre manquant (ni dans le CSV, ni dans le formulaire).');
 }
 
 if ($description === '') {
-    redirect_error('La description est requise (formulaire ou CSV).');
+    redirect_error('Description manquante.');
+}
+
+if (count($questions) === 0) {
+    redirect_error('Aucune question détectée dans le fichier CSV.');
 }
 
 $quizData = [
