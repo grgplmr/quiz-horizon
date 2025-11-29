@@ -145,7 +145,10 @@ if (isset($_GET['import'])) {
           <h3>Importer un nouveau quiz</h3>
           <p class="subtitle">Téléversez un fichier CSV pour générer un quiz JSON.</p>
         </div>
-        <a class="ghost" href="template.csv">Voir le modèle CSV</a>
+        <div class="input-row">
+          <a class="ghost" href="template.csv">Voir le modèle CSV</a>
+          <p class="helper">Le CSV peut inclure <code>#title;Titre du quiz</code> et <code>#description;Description courte</code>.</p>
+        </div>
       </div>
 
       <form action="upload.php" method="POST" enctype="multipart/form-data" class="import-form">
@@ -162,18 +165,20 @@ if (isset($_GET['import'])) {
 
           <div class="form-control">
             <label for="quiz_id">ID du quiz</label>
-            <input type="text" id="quiz_id" name="quiz_id" placeholder="histoire-2" required>
-            <p class="input-hint">Utilisé pour le nom du fichier JSON (lettres, chiffres, tirets, underscores).</p>
+            <input type="text" id="quiz_id" name="quiz_id" placeholder="histoire-2">
+            <p class="input-hint">Utilisé pour le nom du fichier JSON (lettres, chiffres, tirets, underscores). Laissez vide pour générer automatiquement un ID du type histoire-3, aero-1, etc.</p>
           </div>
 
           <div class="form-control">
             <label for="title">Titre</label>
-            <input type="text" id="title" name="title" placeholder="Quiz Histoire #2" required>
+            <input type="text" id="title" name="title" placeholder="Quiz Histoire #2">
+            <p class="input-hint">Optionnel : peut aussi être fourni dans le CSV avec <code>#title;Titre du quiz</code>.</p>
           </div>
 
           <div class="form-control">
             <label for="description">Description courte</label>
-            <input type="text" id="description" name="description" placeholder="20 questions pour réviser" required>
+            <input type="text" id="description" name="description" placeholder="20 questions pour réviser">
+            <p class="input-hint">Optionnel : peut aussi être fournie dans le CSV avec <code>#description;Texte.</code></p>
           </div>
 
           <div class="form-control">
