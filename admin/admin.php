@@ -12,6 +12,8 @@ $loginTime = $_SESSION['login_time'] ?? time();
 $quizzesFile = __DIR__ . '/../api/quizzes/index.json';
 $quizzes = [];
 $status = null;
+$importMessage = null;
+$importClass = 'alert-info';
 
 if (file_exists($quizzesFile)) {
     $json = file_get_contents($quizzesFile);
@@ -25,6 +27,27 @@ if (file_exists($quizzesFile)) {
 }
 
 $modules = array_unique(array_map(fn($quiz) => $quiz['module'] ?? 'Inconnu', $quizzes));
+$moduleOptions = [
+    'aero' => 'Aérodynamique et mécanique du vol',
+    'aeronefs' => 'Connaissance des aéronefs',
+    'meteo' => 'Météorologie et aérologie',
+    'nav' => 'Navigation, sécurité et réglementation',
+    'histoire' => "Histoire de l'aéronautique et de l'espace",
+    'anglais' => 'Anglais aéronautique',
+];
+
+if (isset($_GET['import'])) {
+    $type = $_GET['import'];
+    if ($type === 'success') {
+        $importMessage = 'Quiz importé avec succès.';
+    } elseif ($type === 'updated') {
+        $importMessage = 'Quiz mis à jour avec succès.';
+    } elseif ($type === 'error') {
+        $msg = $_GET['msg'] ?? 'Erreur inconnue.';
+        $importMessage = 'Erreur lors de l\'import : ' . htmlspecialchars($msg, ENT_QUOTES);
+        $importClass = 'alert-error';
+    }
+}
 ?>
 <!DOCTYPE html>
 <html lang="fr">
@@ -49,6 +72,10 @@ $modules = array_unique(array_map(fn($quiz) => $quiz['module'] ?? 'Inconnu', $qu
   </header>
 
   <main class="admin-content">
+    <?php if ($importMessage): ?>
+      <div class="alert <?php echo $importClass; ?>" role="status"><?php echo $importMessage; ?></div>
+    <?php endif; ?>
+
     <?php if ($status): ?>
       <div class="alert alert-info" role="status"><?php echo htmlspecialchars($status, ENT_QUOTES); ?></div>
     <?php endif; ?>
@@ -109,6 +136,55 @@ $modules = array_unique(array_map(fn($quiz) => $quiz['module'] ?? 'Inconnu', $qu
           </table>
         </div>
       <?php endif; ?>
+    </section>
+
+    <section class="card">
+      <div class="section-header">
+        <div>
+          <p class="eyebrow">Import CSV</p>
+          <h3>Importer un nouveau quiz</h3>
+          <p class="subtitle">Téléversez un fichier CSV pour générer un quiz JSON.</p>
+        </div>
+        <a class="ghost" href="template.csv">Voir le modèle CSV</a>
+      </div>
+
+      <form action="upload.php" method="POST" enctype="multipart/form-data" class="import-form">
+        <div class="form-grid">
+          <div class="form-control">
+            <label for="module">Module</label>
+            <select id="module" name="module" required>
+              <?php foreach ($moduleOptions as $value => $label): ?>
+                <option value="<?php echo htmlspecialchars($value, ENT_QUOTES); ?>"><?php echo htmlspecialchars($label, ENT_QUOTES); ?></option>
+              <?php endforeach; ?>
+            </select>
+            <p class="input-hint">Sélectionnez le module associé au quiz.</p>
+          </div>
+
+          <div class="form-control">
+            <label for="quiz_id">ID du quiz</label>
+            <input type="text" id="quiz_id" name="quiz_id" placeholder="histoire-2" required>
+            <p class="input-hint">Utilisé pour le nom du fichier JSON (lettres, chiffres, tirets, underscores).</p>
+          </div>
+
+          <div class="form-control">
+            <label for="title">Titre</label>
+            <input type="text" id="title" name="title" placeholder="Quiz Histoire #2" required>
+          </div>
+
+          <div class="form-control">
+            <label for="description">Description courte</label>
+            <input type="text" id="description" name="description" placeholder="20 questions pour réviser" required>
+          </div>
+
+          <div class="form-control">
+            <label for="csv_file">Fichier CSV</label>
+            <input type="file" id="csv_file" name="csv_file" accept=".csv" required>
+            <p class="input-hint">Délimiteur point-virgule ; 7 colonnes attendues.</p>
+          </div>
+        </div>
+
+        <button type="submit" class="primary full">Importer le quiz</button>
+      </form>
     </section>
   </main>
   <script src="admin.js"></script>
