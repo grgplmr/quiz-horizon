@@ -31,6 +31,85 @@ const MODULES = [
   },
 ];
 
+const MODULE_ICONS = {
+  histoire: '📚',
+  meteo: '☁️',
+  aero: '✈️',
+  navigation: '🧭',
+  nav: '🧭',
+  aeronefs: '🛩️',
+  anglais: '🇬🇧',
+};
+
+const STORAGE_KEYS = {
+  email: 'hbia_quiz_email',
+  results: 'hbia_quiz_results',
+};
+
+function loadEmailFromStorage() {
+  try {
+    return localStorage.getItem(STORAGE_KEYS.email) || '';
+  } catch (error) {
+    return '';
+  }
+}
+
+function saveEmailToStorage(email) {
+  try {
+    if (email) {
+      localStorage.setItem(STORAGE_KEYS.email, email);
+    } else {
+      localStorage.removeItem(STORAGE_KEYS.email);
+    }
+  } catch (error) {
+    // ignore storage errors
+  }
+}
+
+function loadAllResults() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEYS.results);
+    return raw ? JSON.parse(raw) : {};
+  } catch (error) {
+    return {};
+  }
+}
+
+function loadResultsForEmail(email) {
+  if (!email) return [];
+  const allResults = loadAllResults();
+  return allResults[email] || [];
+}
+
+function saveResultForEmail(email, result) {
+  if (!email || !result) return [];
+  const allResults = loadAllResults();
+  const existing = allResults[email] || [];
+  existing.push(result);
+  allResults[email] = existing;
+  try {
+    localStorage.setItem(STORAGE_KEYS.results, JSON.stringify(allResults));
+  } catch (error) {
+    // ignore storage errors
+  }
+  return existing;
+}
+
+function formatResultDate(dateString) {
+  const date = new Date(dateString);
+  return date.toLocaleString('fr-FR', {
+    year: 'numeric',
+    month: 'short',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+  });
+}
+
+function getModuleIcon(slug) {
+  return MODULE_ICONS[slug] || '✨';
+}
+
 const state = {
   view: 'home',
   currentQuiz: null,
@@ -47,6 +126,8 @@ const state = {
   allQuizzes: [],
   selectedModule: null,
   moduleQuizzes: [],
+  userEmail: '',
+  savedResults: [],
 };
 
 function showView(name) {
@@ -140,6 +221,7 @@ async function startQuizFromMeta(quizMeta) {
 }
 
 function goHome() {
+  renderHome();
   resetModuleSelection();
   showView('home');
   window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -338,10 +420,35 @@ function handleNextQuestion() {
 
 function showResults() {
   const viewResult = document.getElementById('view-result');
+  const moduleSlug = state.currentQuiz?.module || state.selectedModule?.slug || '';
+  const moduleInfo = MODULES.find((entry) => entry.slug === moduleSlug) || state.selectedModule;
+  const moduleTitle = moduleInfo?.label || '';
+
+  function persistResult(scoreValue, totalQuestions) {
+    if (!state.userEmail) return;
+
+    const modeValue = state.mode === 'training' ? 'entrainement' : 'examen';
+
+    const result = {
+      quizId: state.currentQuiz?.id || state.currentQuiz?.questionsFile || 'quiz',
+      quizTitle: state.currentQuiz?.title || 'Quiz',
+      module: moduleSlug,
+      moduleTitle,
+      score: scoreValue,
+      total: totalQuestions,
+      mode: modeValue,
+      date: new Date().toISOString(),
+    };
+
+    state.savedResults = saveResultForEmail(state.userEmail, result);
+  }
+
   if (state.mode === 'training') {
     const total = state.questions.length || 1;
     const scoreOn20 = 20;
     const percent = 100;
+
+    persistResult(total, total);
 
     viewResult.innerHTML = `
       <div class="result-panel">
@@ -360,6 +467,7 @@ function showResults() {
     const totalQuestions = state.questions.length || 1;
     const correctCount = state.answers.filter((answer) => answer.isCorrect).length;
     const percent = Math.round((correctCount / totalQuestions) * 100);
+    persistResult(correctCount, totalQuestions);
     const incorrectAnswers = state.answers.filter((answer) => !answer.isCorrect);
     const incorrectList = incorrectAnswers
       .map((answer) => {
@@ -437,14 +545,96 @@ async function prepareModuleSelection(moduleSlug) {
   renderModuleView();
 }
 
-function setupHome() {
-  const modulesContainer = document.querySelector('.modules');
+function renderSavedResults() {
+  const resultsContainer = document.getElementById('saved-results');
+  if (!resultsContainer) return;
+
+  const hasResults = Boolean(state.userEmail && state.savedResults.length);
+  resultsContainer.classList.toggle('hidden', !hasResults);
+
+  if (!hasResults) {
+    resultsContainer.innerHTML = '';
+    return;
+  }
+
+  const limitedResults = [...state.savedResults]
+    .sort((a, b) => new Date(b.date) - new Date(a.date))
+    .slice(0, 8);
+
+  const listItems = limitedResults
+    .map(
+      (item) => `
+        <li>
+          <div class="result-row">
+            <span class="result-date">${formatResultDate(item.date)}</span>
+            <span class="result-module">${item.moduleTitle || item.module || ''}</span>
+          </div>
+          <div class="result-details">
+            <span class="result-title">${item.quizTitle}</span>
+            <span class="result-score">${item.score} / ${item.total} · ${
+              item.mode === 'training' || item.mode === 'entrainement'
+                ? 'Entraînement'
+                : 'Examen blanc'
+            }</span>
+          </div>
+        </li>
+      `
+    )
+    .join('');
+
+  resultsContainer.innerHTML = `
+    <div class="saved-results-header">
+      <p>Vos derniers résultats pour : <strong>${state.userEmail}</strong></p>
+    </div>
+    <ul class="saved-results-list">${listItems}</ul>
+  `;
+}
+
+function renderHome() {
+  const homeSection = document.getElementById('view-home');
+  if (!homeSection) return;
+
+  homeSection.innerHTML = `
+    <div class="modules" id="modules-grid"></div>
+    <div class="info-section">
+      <div class="info-card">
+        <h3>Comment fonctionnent les quiz ?</h3>
+        <p>À chaque quiz, vous choisissez un mode :</p>
+        <ul class="info-list">
+          <li><strong>Mode entraînement :</strong> les questions reviennent en boucle jusqu’à trouver la bonne réponse. Idéal pour mémoriser.</li>
+          <li><strong>Mode examen blanc :</strong> répondez à tout puis découvrez votre score et la correction à la fin, comme le jour J.</li>
+          <li>Si vous saisissez un email, vos résultats sont enregistrés localement pour les retrouver plus tard.</li>
+        </ul>
+      </div>
+      <div class="info-card">
+        <h3>Retrouvez vos résultats</h3>
+        <form id="email-form" class="email-form">
+          <label for="user-email">Votre email (optionnel)</label>
+          <div class="email-input-row">
+            <input type="email" id="user-email" name="user-email" placeholder="nom.prenom@example.com" value="${
+              state.userEmail || ''
+            }" />
+            <button type="submit" class="secondary">${state.userEmail ? 'Mettre à jour' : 'Enregistrer'}</button>
+          </div>
+          <p class="help-text">L'email n'est utilisé que pour retrouver vos résultats sur cet appareil. Il n'est pas envoyé au serveur.</p>
+        </form>
+        <div id="saved-results" class="saved-results hidden"></div>
+      </div>
+    </div>
+  `;
+
+  const modulesContainer = document.getElementById('modules-grid');
   if (modulesContainer) {
     modulesContainer.innerHTML = MODULES.map(
       (module) => `
         <div class="module-card">
-          <h2>${module.label}</h2>
-          <p>${module.description}</p>
+          <div class="module-card-header">
+            <span class="module-icon" aria-hidden="true">${getModuleIcon(module.slug)}</span>
+            <div class="module-card-text">
+              <h2>${module.label}</h2>
+              <p>${module.description}</p>
+            </div>
+          </div>
           <button data-module="${module.slug}">Commencer</button>
         </div>
       `
@@ -458,6 +648,22 @@ function setupHome() {
       await prepareModuleSelection(moduleSlug);
     });
   });
+
+  const emailForm = document.getElementById('email-form');
+  if (emailForm) {
+    emailForm.addEventListener('submit', (event) => {
+      event.preventDefault();
+      const input = document.getElementById('user-email');
+      const newEmail = input?.value.trim() || '';
+      state.userEmail = newEmail;
+      state.savedResults = loadResultsForEmail(newEmail);
+      saveEmailToStorage(newEmail);
+      renderHome();
+      renderSavedResults();
+    });
+  }
+
+  renderSavedResults();
 }
 
 function setupHeader() {
@@ -465,6 +671,15 @@ function setupHeader() {
   if (!header) return;
 
   header.classList.add('app-header');
+
+  let backLink = header.querySelector('.back-site-link');
+  if (!backLink) {
+    backLink = document.createElement('a');
+    header.appendChild(backLink);
+  }
+  backLink.href = 'https://www.horizonbia.com/';
+  backLink.className = 'back-site-link';
+  backLink.textContent = '← Retour au site HorizonBIA';
 
   let title = header.querySelector('h1');
   if (!title) {
@@ -485,9 +700,11 @@ function setupHeader() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+  state.userEmail = loadEmailFromStorage();
+  state.savedResults = loadResultsForEmail(state.userEmail);
   ensureModuleView();
   ensureQuizzesLoaded();
-  setupHome();
+  renderHome();
   setupHeader();
   showView('home');
 });
