@@ -93,14 +93,7 @@ if (isset($_GET['deleted'])) {
         $deleteMessage = 'Quiz supprimé avec succès.';
         $deleteClass = 'alert-success';
     } elseif ($_GET['deleted'] === '0') {
-        $reason = $_GET['reason'] ?? '';
-        if ($reason === 'not_found') {
-            $deleteMessage = 'Quiz introuvable.';
-        } elseif ($reason === 'invalid_request') {
-            $deleteMessage = 'Requête de suppression invalide.';
-        } else {
-            $deleteMessage = 'Erreur lors de la suppression du quiz.';
-        }
+        $deleteMessage = 'Erreur lors de la suppression du quiz.';
         $deleteClass = 'alert-error';
     }
 }
@@ -197,15 +190,17 @@ if (isset($_GET['deleted'])) {
                     <td><?php echo htmlspecialchars($quiz['file'] ?? ($quiz['questionsFile'] ?? 'N/A'), ENT_QUOTES); ?></td>
                     <td><?php echo htmlspecialchars($quiz['description'] ?? '', ENT_QUOTES); ?></td>
                     <td>
-                      <button
-                        type="button"
-                        class="btn-ghost btn-danger js-delete-quiz"
-                        data-quiz-id="<?php echo htmlspecialchars($quiz['id'] ?? '', ENT_QUOTES); ?>"
-                        data-module-slug="<?php echo htmlspecialchars($module['slug'] ?? '', ENT_QUOTES); ?>"
-                        data-quiz-title="<?php echo htmlspecialchars($quiz['title'] ?? '', ENT_QUOTES); ?>"
+                      <?php $quizFileName = $quiz['questionsFile'] ?? ($quiz['file'] ?? (($quiz['id'] ?? '') . '.json')); ?>
+                      <form
+                        method="POST"
+                        action="delete.php"
+                        class="quiz-delete-form"
+                        onsubmit="return confirm('Confirmer la suppression du quiz &quot;<?php echo htmlspecialchars($quiz['title'] ?? 'Sans titre', ENT_QUOTES); ?>&quot; ? Cette action est irréversible.');"
                       >
-                        Supprimer
-                      </button>
+                        <input type="hidden" name="quiz_id" value="<?php echo htmlspecialchars($quiz['id'] ?? '', ENT_QUOTES); ?>">
+                        <input type="hidden" name="quiz_file" value="<?php echo htmlspecialchars($quizFileName, ENT_QUOTES); ?>">
+                        <button type="submit" class="btn btn-danger btn-sm">Supprimer</button>
+                      </form>
                     </td>
                   </tr>
                 <?php endforeach; ?>
