@@ -10,7 +10,8 @@ $username = $_SESSION['admin_username'] ?? 'admin';
 $loginTime = $_SESSION['login_time'] ?? time();
 
 $quizzesFile = __DIR__ . '/../api/quizzes/index.json';
-$quizzes = [];
+$modules = [];
+$totalQuizzes = 0;
 $status = null;
 $importMessage = null;
 $importClass = 'alert-info';
@@ -19,16 +20,17 @@ $deleteClass = 'alert-info';
 
 if (file_exists($quizzesFile)) {
     $json = file_get_contents($quizzesFile);
-    $quizzes = json_decode($json, true) ?? [];
-    if (json_last_error() !== JSON_ERROR_NONE) {
+    $decoded = json_decode($json, true);
+
+    if (json_last_error() !== JSON_ERROR_NONE || !is_array($decoded)) {
         $status = 'Le fichier des quiz est illisible (JSON invalide).';
-        $quizzes = [];
+        $decoded = [];
     }
 } else {
     $status = 'Le fichier des quiz n\'existe pas encore.';
+    $decoded = [];
 }
 
-$modules = array_unique(array_map(fn($quiz) => $quiz['module'] ?? 'Inconnu', $quizzes));
 $moduleOptions = [
     'aero' => 'Aérodynamique et mécanique du vol',
     'aeronefs' => 'Connaissance des aéronefs',
@@ -37,6 +39,41 @@ $moduleOptions = [
     'histoire' => "Histoire de l'aéronautique et de l'espace",
     'anglais' => 'Anglais aéronautique',
 ];
+
+if (isset($decoded['modules']) && is_array($decoded['modules'])) {
+    $modules = $decoded['modules'];
+    foreach ($modules as $module) {
+        $totalQuizzes += isset($module['quizzes']) && is_array($module['quizzes']) ? count($module['quizzes']) : 0;
+    }
+} elseif (is_array($decoded) && array_keys($decoded) === range(0, count($decoded) - 1)) {
+    $grouped = [];
+    foreach ($decoded as $quiz) {
+        $slug = $quiz['module'] ?? 'inconnu';
+        if (!isset($grouped[$slug])) {
+            $grouped[$slug] = [
+                'slug' => $slug,
+                'title' => $moduleOptions[$slug] ?? ucfirst($slug),
+                'quizzes' => [],
+            ];
+        }
+
+        $grouped[$slug]['quizzes'][] = [
+            'id' => $quiz['id'] ?? '',
+            'title' => $quiz['title'] ?? 'Sans titre',
+            'description' => $quiz['description'] ?? '',
+            'file' => $quiz['questionsFile'] ?? ($quiz['file'] ?? (($quiz['id'] ?? '') . '.json')),
+        ];
+    }
+
+    $modules = array_values($grouped);
+    $totalQuizzes = count($decoded);
+}
+
+foreach ($modules as $index => $module) {
+    if (!isset($module['title']) && isset($module['slug'])) {
+        $modules[$index]['title'] = $moduleOptions[$module['slug']] ?? $module['slug'];
+    }
+}
 
 if (isset($_GET['import'])) {
     $type = $_GET['import'];
@@ -110,7 +147,7 @@ if (isset($_GET['deleted'])) {
     <section class="stats-grid">
       <div class="card stat-card">
         <p class="eyebrow">Quiz disponibles</p>
-        <h2><?php echo count($quizzes); ?></h2>
+        <h2><?php echo $totalQuizzes; ?></h2>
         <p class="helper">Fichiers listés dans <code>api/quizzes/index.json</code></p>
       </div>
       <div class="card stat-card">
@@ -135,7 +172,7 @@ if (isset($_GET['deleted'])) {
         <a class="primary" href="../api/quizzes/index.json">Voir le JSON brut</a>
       </div>
 
-      <?php if (empty($quizzes)): ?>
+      <?php if ($totalQuizzes === 0): ?>
         <p>Aucun quiz détecté pour le moment.</p>
       <?php else: ?>
         <div class="table-wrapper">
@@ -151,20 +188,27 @@ if (isset($_GET['deleted'])) {
               </tr>
             </thead>
             <tbody>
-              <?php foreach ($quizzes as $quiz): ?>
-                <tr>
-                  <td><code><?php echo htmlspecialchars($quiz['id'] ?? '—', ENT_QUOTES); ?></code></td>
-                  <td><?php echo htmlspecialchars($quiz['title'] ?? 'Sans titre', ENT_QUOTES); ?></td>
-                  <td><span class="pill"><?php echo htmlspecialchars($quiz['module'] ?? 'N/A', ENT_QUOTES); ?></span></td>
-                  <td><?php echo htmlspecialchars($quiz['questionsFile'] ?? 'N/A', ENT_QUOTES); ?></td>
-                  <td><?php echo htmlspecialchars($quiz['description'] ?? '', ENT_QUOTES); ?></td>
-                  <td>
-                    <form action="delete.php" method="POST" class="inline-form" onsubmit="return confirmDeleteQuiz('<?php echo htmlspecialchars($quiz['title'] ?? $quiz['id'] ?? 'ce quiz', ENT_QUOTES); ?>');">
-                      <input type="hidden" name="quiz_id" value="<?php echo htmlspecialchars($quiz['id'] ?? '', ENT_QUOTES); ?>">
-                      <button type="submit" class="btn-ghost btn-danger">Supprimer</button>
-                    </form>
-                  </td>
-                </tr>
+              <?php foreach ($modules as $module): ?>
+                <?php foreach (($module['quizzes'] ?? []) as $quiz): ?>
+                  <tr>
+                    <td><code><?php echo htmlspecialchars($quiz['id'] ?? '—', ENT_QUOTES); ?></code></td>
+                    <td><?php echo htmlspecialchars($quiz['title'] ?? 'Sans titre', ENT_QUOTES); ?></td>
+                    <td><span class="pill"><?php echo htmlspecialchars($module['title'] ?? ($module['slug'] ?? 'N/A'), ENT_QUOTES); ?></span></td>
+                    <td><?php echo htmlspecialchars($quiz['file'] ?? ($quiz['questionsFile'] ?? 'N/A'), ENT_QUOTES); ?></td>
+                    <td><?php echo htmlspecialchars($quiz['description'] ?? '', ENT_QUOTES); ?></td>
+                    <td>
+                      <button
+                        type="button"
+                        class="btn-ghost btn-danger js-delete-quiz"
+                        data-quiz-id="<?php echo htmlspecialchars($quiz['id'] ?? '', ENT_QUOTES); ?>"
+                        data-module-slug="<?php echo htmlspecialchars($module['slug'] ?? '', ENT_QUOTES); ?>"
+                        data-quiz-title="<?php echo htmlspecialchars($quiz['title'] ?? '', ENT_QUOTES); ?>"
+                      >
+                        Supprimer
+                      </button>
+                    </td>
+                  </tr>
+                <?php endforeach; ?>
               <?php endforeach; ?>
             </tbody>
           </table>
