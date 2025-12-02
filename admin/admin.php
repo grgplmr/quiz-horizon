@@ -14,6 +14,8 @@ $quizzes = [];
 $status = null;
 $importMessage = null;
 $importClass = 'alert-info';
+$deleteMessage = null;
+$deleteClass = 'alert-info';
 
 if (file_exists($quizzesFile)) {
     $json = file_get_contents($quizzesFile);
@@ -48,6 +50,23 @@ if (isset($_GET['import'])) {
         $importClass = 'alert-error';
     }
 }
+
+if (isset($_GET['deleted'])) {
+    if ($_GET['deleted'] === '1') {
+        $deleteMessage = 'Quiz supprimé avec succès.';
+        $deleteClass = 'alert-success';
+    } elseif ($_GET['deleted'] === '0') {
+        $reason = $_GET['reason'] ?? '';
+        if ($reason === 'not_found') {
+            $deleteMessage = 'Quiz introuvable.';
+        } elseif ($reason === 'invalid_request') {
+            $deleteMessage = 'Requête de suppression invalide.';
+        } else {
+            $deleteMessage = 'Erreur lors de la suppression du quiz.';
+        }
+        $deleteClass = 'alert-error';
+    }
+}
 ?>
 <!DOCTYPE html>
 <html lang="fr">
@@ -78,6 +97,10 @@ if (isset($_GET['import'])) {
   <main class="admin-content">
     <?php if ($importMessage): ?>
       <div class="alert <?php echo $importClass; ?>" role="status"><?php echo $importMessage; ?></div>
+    <?php endif; ?>
+
+    <?php if ($deleteMessage): ?>
+      <div class="alert <?php echo $deleteClass; ?>" role="status"><?php echo htmlspecialchars($deleteMessage, ENT_QUOTES); ?></div>
     <?php endif; ?>
 
     <?php if ($status): ?>
@@ -124,6 +147,7 @@ if (isset($_GET['import'])) {
                 <th>Module</th>
                 <th>Fichier</th>
                 <th>Description</th>
+                <th>Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -134,6 +158,12 @@ if (isset($_GET['import'])) {
                   <td><span class="pill"><?php echo htmlspecialchars($quiz['module'] ?? 'N/A', ENT_QUOTES); ?></span></td>
                   <td><?php echo htmlspecialchars($quiz['questionsFile'] ?? 'N/A', ENT_QUOTES); ?></td>
                   <td><?php echo htmlspecialchars($quiz['description'] ?? '', ENT_QUOTES); ?></td>
+                  <td>
+                    <form action="delete.php" method="POST" class="inline-form" onsubmit="return confirmDeleteQuiz('<?php echo htmlspecialchars($quiz['title'] ?? $quiz['id'] ?? 'ce quiz', ENT_QUOTES); ?>');">
+                      <input type="hidden" name="quiz_id" value="<?php echo htmlspecialchars($quiz['id'] ?? '', ENT_QUOTES); ?>">
+                      <button type="submit" class="btn-ghost btn-danger">Supprimer</button>
+                    </form>
+                  </td>
                 </tr>
               <?php endforeach; ?>
             </tbody>

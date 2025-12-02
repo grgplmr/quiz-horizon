@@ -10,3 +10,7 @@
     });
   }
 })();
+
+function confirmDeleteQuiz(title) {
+  return window.confirm('Supprimer le quiz "' + title + '" ? Cette action est irréversible.');
+}
