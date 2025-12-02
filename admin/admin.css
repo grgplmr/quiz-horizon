@@ -278,6 +278,23 @@ table thead { background: rgba(255, 255, 255, 0.03); }
   margin: 0;
 }
 
+.quiz-delete-form,
+.quiz-move-form {
+  margin: 0.25rem 0;
+}
+
+.quiz-move-form {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.quiz-move-select {
+  max-width: 220px;
+  font-size: 14px;
+}
+
 @media (max-width: 720px) {
   body { padding: 18px 12px; }
   .admin-header { flex-direction: column; align-items: flex-start; }
