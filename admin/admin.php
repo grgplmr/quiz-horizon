@@ -17,6 +17,8 @@ $importMessage = null;
 $importClass = 'alert-info';
 $deleteMessage = null;
 $deleteClass = 'alert-info';
+$moveMessage = null;
+$moveClass = 'alert-info';
 
 if (file_exists($quizzesFile)) {
     $json = file_get_contents($quizzesFile);
@@ -97,6 +99,16 @@ if (isset($_GET['deleted'])) {
         $deleteClass = 'alert-error';
     }
 }
+
+if (isset($_GET['moved'])) {
+    if ($_GET['moved'] === '1') {
+        $moveMessage = 'Quiz déplacé avec succès.';
+        $moveClass = 'alert-success';
+    } elseif ($_GET['moved'] === '0') {
+        $moveMessage = 'Erreur lors du déplacement du quiz.';
+        $moveClass = 'alert-error';
+    }
+}
 ?>
 <!DOCTYPE html>
 <html lang="fr">
@@ -131,6 +143,10 @@ if (isset($_GET['deleted'])) {
 
     <?php if ($deleteMessage): ?>
       <div class="alert <?php echo $deleteClass; ?>" role="status"><?php echo htmlspecialchars($deleteMessage, ENT_QUOTES); ?></div>
+    <?php endif; ?>
+
+    <?php if ($moveMessage): ?>
+      <div class="alert <?php echo $moveClass; ?>" role="status"><?php echo htmlspecialchars($moveMessage, ENT_QUOTES); ?></div>
     <?php endif; ?>
 
     <?php if ($status): ?>
@@ -191,6 +207,19 @@ if (isset($_GET['deleted'])) {
                     <td><?php echo htmlspecialchars($quiz['description'] ?? '', ENT_QUOTES); ?></td>
                     <td>
                       <?php $quizFileName = $quiz['questionsFile'] ?? ($quiz['file'] ?? (($quiz['id'] ?? '') . '.json')); ?>
+                      <?php $currentModule = $quiz['module'] ?? ($module['slug'] ?? ''); ?>
+                      <form method="POST" action="move.php" class="quiz-move-form">
+                        <input type="hidden" name="quiz_id" value="<?php echo htmlspecialchars($quiz['id'] ?? '', ENT_QUOTES); ?>">
+                        <select name="new_module" class="quiz-move-select">
+                          <?php foreach ($moduleOptions as $value => $label): ?>
+                            <option value="<?php echo htmlspecialchars($value, ENT_QUOTES); ?>" <?php echo ($value === $currentModule) ? 'selected' : ''; ?>>
+                              <?php echo htmlspecialchars($label, ENT_QUOTES); ?>
+                            </option>
+                          <?php endforeach; ?>
+                        </select>
+                        <button type="submit" class="btn btn-secondary btn-sm">Déplacer</button>
+                      </form>
+
                       <form
                         method="POST"
                         action="delete.php"
