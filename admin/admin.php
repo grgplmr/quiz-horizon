@@ -181,61 +181,91 @@ if (isset($_GET['moved'])) {
         <a class="primary" href="../api/quizzes/index.json">Voir le JSON brut</a>
       </div>
 
+      <div class="module-accordion-actions">
+        <button type="button" class="btn-ghost" id="expandAllModules">Développer tout</button>
+        <button type="button" class="btn-ghost" id="collapseAllModules">Réduire tout</button>
+      </div>
+
       <?php if ($totalQuizzes === 0): ?>
         <p>Aucun quiz détecté pour le moment.</p>
       <?php else: ?>
-        <div class="table-wrapper">
-          <table>
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Titre</th>
-                <th>Module</th>
-                <th>Fichier</th>
-                <th>Description</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              <?php foreach ($modules as $module): ?>
-                <?php foreach (($module['quizzes'] ?? []) as $quiz): ?>
-                  <tr>
-                    <td><code><?php echo htmlspecialchars($quiz['id'] ?? '—', ENT_QUOTES); ?></code></td>
-                    <td><?php echo htmlspecialchars($quiz['title'] ?? 'Sans titre', ENT_QUOTES); ?></td>
-                    <td><span class="pill"><?php echo htmlspecialchars($module['title'] ?? ($module['slug'] ?? 'N/A'), ENT_QUOTES); ?></span></td>
-                    <td><?php echo htmlspecialchars($quiz['file'] ?? ($quiz['questionsFile'] ?? 'N/A'), ENT_QUOTES); ?></td>
-                    <td><?php echo htmlspecialchars($quiz['description'] ?? '', ENT_QUOTES); ?></td>
-                    <td>
-                      <?php $quizFileName = $quiz['questionsFile'] ?? ($quiz['file'] ?? (($quiz['id'] ?? '') . '.json')); ?>
-                      <?php $currentModule = $quiz['module'] ?? ($module['slug'] ?? ''); ?>
-                      <form method="POST" action="move.php" class="quiz-move-form">
-                        <input type="hidden" name="quiz_id" value="<?php echo htmlspecialchars($quiz['id'] ?? '', ENT_QUOTES); ?>">
-                        <select name="new_module" class="quiz-move-select">
-                          <?php foreach ($moduleOptions as $value => $label): ?>
-                            <option value="<?php echo htmlspecialchars($value, ENT_QUOTES); ?>" <?php echo ($value === $currentModule) ? 'selected' : ''; ?>>
-                              <?php echo htmlspecialchars($label, ENT_QUOTES); ?>
-                            </option>
-                          <?php endforeach; ?>
-                        </select>
-                        <button type="submit" class="btn btn-secondary btn-sm">Déplacer</button>
-                      </form>
+        <div class="module-accordion">
+          <?php foreach ($modules as $module): ?>
+            <?php $quizzes = $module['quizzes'] ?? []; ?>
+            <?php $quizCount = is_array($quizzes) ? count($quizzes) : 0; ?>
+            <details class="module-panel" open>
+              <summary class="module-panel-header">
+                <div>
+                  <p class="eyebrow">Module</p>
+                  <div class="module-panel-title">
+                    <span><?php echo htmlspecialchars($module['title'] ?? ($module['slug'] ?? 'Sans titre'), ENT_QUOTES); ?></span>
+                    <?php if (!empty($module['slug'])): ?>
+                      <span class="pill pill-muted"><?php echo htmlspecialchars($module['slug'], ENT_QUOTES); ?></span>
+                    <?php endif; ?>
+                  </div>
+                </div>
+                <div class="module-panel-meta">
+                  <span class="pill"><?php echo $quizCount; ?> quiz<?php echo $quizCount > 1 ? 's' : ''; ?></span>
+                </div>
+              </summary>
 
-                      <form
-                        method="POST"
-                        action="delete.php"
-                        class="quiz-delete-form"
-                        onsubmit="return confirm('Confirmer la suppression du quiz &quot;<?php echo htmlspecialchars($quiz['title'] ?? 'Sans titre', ENT_QUOTES); ?>&quot; ? Cette action est irréversible.');"
-                      >
-                        <input type="hidden" name="quiz_id" value="<?php echo htmlspecialchars($quiz['id'] ?? '', ENT_QUOTES); ?>">
-                        <input type="hidden" name="quiz_file" value="<?php echo htmlspecialchars($quizFileName, ENT_QUOTES); ?>">
-                        <button type="submit" class="btn btn-danger btn-sm">Supprimer</button>
-                      </form>
-                    </td>
-                  </tr>
-                <?php endforeach; ?>
-              <?php endforeach; ?>
-            </tbody>
-          </table>
+              <div class="module-panel-body">
+                <?php if ($quizCount === 0): ?>
+                  <p class="helper">Aucun quiz dans ce module pour le moment.</p>
+                <?php else: ?>
+                  <div class="table-wrapper">
+                    <table>
+                      <thead>
+                        <tr>
+                          <th>ID</th>
+                          <th>Titre</th>
+                          <th>Fichier</th>
+                          <th>Description</th>
+                          <th>Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <?php foreach ($quizzes as $quiz): ?>
+                          <tr>
+                            <td><code><?php echo htmlspecialchars($quiz['id'] ?? '—', ENT_QUOTES); ?></code></td>
+                            <td><?php echo htmlspecialchars($quiz['title'] ?? 'Sans titre', ENT_QUOTES); ?></td>
+                            <td><?php echo htmlspecialchars($quiz['file'] ?? ($quiz['questionsFile'] ?? 'N/A'), ENT_QUOTES); ?></td>
+                            <td><?php echo htmlspecialchars($quiz['description'] ?? '', ENT_QUOTES); ?></td>
+                            <td>
+                              <?php $quizFileName = $quiz['questionsFile'] ?? ($quiz['file'] ?? (($quiz['id'] ?? '') . '.json')); ?>
+                              <?php $currentModule = $quiz['module'] ?? ($module['slug'] ?? ''); ?>
+                              <form method="POST" action="move.php" class="quiz-move-form">
+                                <input type="hidden" name="quiz_id" value="<?php echo htmlspecialchars($quiz['id'] ?? '', ENT_QUOTES); ?>">
+                                <select name="new_module" class="quiz-move-select">
+                                  <?php foreach ($moduleOptions as $value => $label): ?>
+                                    <option value="<?php echo htmlspecialchars($value, ENT_QUOTES); ?>" <?php echo ($value === $currentModule) ? 'selected' : ''; ?>>
+                                      <?php echo htmlspecialchars($label, ENT_QUOTES); ?>
+                                    </option>
+                                  <?php endforeach; ?>
+                                </select>
+                                <button type="submit" class="btn btn-secondary btn-sm">Déplacer</button>
+                              </form>
+
+                              <form
+                                method="POST"
+                                action="delete.php"
+                                class="quiz-delete-form"
+                                onsubmit="return confirm('Confirmer la suppression du quiz &quot;<?php echo htmlspecialchars($quiz['title'] ?? 'Sans titre', ENT_QUOTES); ?>&quot; ? Cette action est irréversible.');"
+                              >
+                                <input type="hidden" name="quiz_id" value="<?php echo htmlspecialchars($quiz['id'] ?? '', ENT_QUOTES); ?>">
+                                <input type="hidden" name="quiz_file" value="<?php echo htmlspecialchars($quizFileName, ENT_QUOTES); ?>">
+                                <button type="submit" class="btn btn-danger btn-sm">Supprimer</button>
+                              </form>
+                            </td>
+                          </tr>
+                        <?php endforeach; ?>
+                      </tbody>
+                    </table>
+                  </div>
+                <?php endif; ?>
+              </div>
+            </details>
+          <?php endforeach; ?>
         </div>
       <?php endif; ?>
     </section>
